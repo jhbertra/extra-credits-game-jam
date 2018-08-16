@@ -616,7 +616,7 @@ PlayerSettings:
   cloudServicesEnabled:
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: 24616ee6-af05-48cb-a67c-82ddba2d8b45
   projectName: EC Game Jam
   organizationId: jamie-bertram
