@@ -94,3 +94,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+# IntelliJ Platform
+
+.idea
