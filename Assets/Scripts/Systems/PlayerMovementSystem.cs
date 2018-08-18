@@ -24,7 +24,7 @@ namespace Scripts.Systems
 
         private static void UpdateSpeed(Entity entity)
         {
-            entity.Speed.HorizontalSpeed = entity.Input.Horizontal;
+            entity.Speed.HorizontalSpeed = entity.Input.Horizontal * entity.Speed.HorizontalMultiplier;
         }
 
         private static void UpdatePosition(Entity entity)
@@ -38,6 +38,9 @@ namespace Scripts.Systems
                 : entity.Speed.HorizontalSpeed < 0
                     ? -1
                     : scale.x;
+
+            entity.Transform.position = position;
+            entity.Transform.localScale = scale;
         }
     }
 }
