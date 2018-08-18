@@ -38,6 +38,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4295683583201762}
   - component: {fileID: 114189401883824814}
+  - component: {fileID: 60197062407501518}
   m_Layer: 0
   m_Name: CornerMagnetic
   m_TagString: Untagged
@@ -83,7 +84,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1404270597795314}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -13.6, y: 3.61, z: -0.10254149}
+  m_LocalPosition: {x: -26.06, y: 0.89, z: -0.10254149}
   m_LocalScale: {x: 0.48689553, y: 1.5189476, z: 1.6646}
   m_Children:
   - {fileID: 4673854664316208}
@@ -188,6 +189,37 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1098107250475006}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!60 &60197062407501518
+PolygonCollider2D:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1404270597795314}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0.9596179, y: 0.51103634}
+      - {x: -0.5039145, y: 0.5041074}
+      - {x: -0.5132613, y: -0.5024465}
+      - {x: 0.50083935, y: -0.49846485}
+      - {x: 0.54216367, y: 0.19196458}
+      - {x: 2.65679, y: 0.17891987}
+      - {x: 2.6354795, y: 0.50614333}
 --- !u!65 &65136140267606852
 BoxCollider:
   m_ObjectHideFlags: 1
