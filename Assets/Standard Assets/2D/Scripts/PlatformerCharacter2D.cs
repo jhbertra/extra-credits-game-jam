@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -13,6 +14,9 @@ namespace UnitySampleAssets._2D
 
         [FormerlySerializedAs("jumpForce")] [SerializeField]
         private float _jumpForce = 400f; // Amount of force added when the player jumps.
+
+        [FormerlySerializedAs("jumpForce")] [SerializeField]
+        private float _magnetForce = 400f; // Amount of force added when the player engages the magnet.
 
         [FormerlySerializedAs("jumpReleaseDamping")] [SerializeField]
         private float _jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
@@ -50,6 +54,8 @@ namespace UnitySampleAssets._2D
         private float _baseGravityScale;
 
         private Transform _closestMetalSource;
+        private Transform _affectedMetal;
+        private MagnetAction _magnetAction;
 
 
         private void Awake()
@@ -81,9 +87,7 @@ namespace UnitySampleAssets._2D
             bool jump,
             bool jumpHold,
             bool push,
-            bool pushHold,
-            bool pull,
-            bool pullHold)
+            bool pull)
         {
             this._closestMetalSource = this.DetectMetal();
 
@@ -152,6 +156,44 @@ namespace UnitySampleAssets._2D
             {
                 this._rigidBody2d.gravityScale = this._baseGravityScale;
             }
+
+            if (push || pull && this._magnetAction == MagnetAction.Nothing)
+            {
+                this._affectedMetal = this._closestMetalSource;
+                this._magnetAction = push
+                    ? MagnetAction.Push
+                    : MagnetAction.Pull;
+            }
+            else if (!push && !pull)
+            {
+                this._affectedMetal = null;
+                this._magnetAction = MagnetAction.Nothing;
+            }
+
+            if (this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
+            {
+                var affectVector = this._affectedMetal.position - this.transform.position;
+
+                Debug.DrawRay(this.transform.position, affectVector, Color.cyan);
+
+                if (this._magnetAction == MagnetAction.Push)
+                {
+                    this._rigidBody2d.AddForce(
+                        affectVector
+                        * -math.max(
+                            0f,
+                            math.lerp(
+                                this._magnetForce,
+                                0f,
+                                Vector2.Distance(
+                                    this.transform.position,
+                                    this._affectedMetal.position)
+                                / this.magnetismRange)));
+
+                    this._grounded = false;
+                    this._anim.SetBool("Ground", false);
+                }
+            }
         }
 
         private Transform DetectMetal()
@@ -160,6 +202,13 @@ namespace UnitySampleAssets._2D
                 .OverlapCircleAll(transform.position, magnetismRange, this._whatIsMetal)
                 .Select(x => x.transform)
                 .FirstOrDefault();
+        }
+
+        enum MagnetAction
+        {
+            Nothing = 0,
+            Push,
+            Pull
         }
     }
 
