@@ -12,6 +12,8 @@ namespace UnitySampleAssets._2D
         [SerializeField] private float jumpForce = 400f; // Amount of force added when the player jumps.
         [SerializeField] private float jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
         [SerializeField] private float fallMultiplier = 1f; // Amount of force added when the player jumps.
+        [SerializeField] private int magnetismRange = 5;
+        [SerializeField] private float magnetismSpeed = 1.0f;
 
         [Range(0, 1)] [SerializeField] private float crouchSpeed = .36f;
                                                      // Amount of maxSpeed applied to crouching movement. 1 = 100%
@@ -121,6 +123,15 @@ namespace UnitySampleAssets._2D
             Vector3 theScale = transform.localScale;
             theScale.x *= -1;
             transform.localScale = theScale;
+        }
+
+        public void Attract(){
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position,magnetismRange,1 << LayerMask.NameToLayer("Metal"));
+            Debug.Log(colliders.Length);
+            if (colliders.Length > 0)
+            {
+                transform.position = Vector2.MoveTowards(transform.position,colliders[0].transform.position,magnetismSpeed);
+            }
         }
     }
 }

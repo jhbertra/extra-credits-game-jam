@@ -31,6 +31,11 @@ namespace UnitySampleAssets._2D
             // Pass all parameters to the character control script.
             character.Move(h, crouch, jump, this.jumpHold);
             jump = false;
+            float attract = Input.GetAxis("Fire1");
+            if (attract > 0)
+            {
+                character.Attract();
+            }
         }
     }
 }
