@@ -103,6 +103,7 @@ namespace UnitySampleAssets._2D
          */
 
         private const float GroundedRadius = .2f;
+        private const float MetalRadius = .05f;
         private const float CeilingRadius = .01f;
 
 
@@ -113,6 +114,9 @@ namespace UnitySampleAssets._2D
         // ReSharper disable NotNullMemberIsNotInitialized
         [NotNull] private Transform _groundCheck; // A position marking where to check if the player is grounded.
         [NotNull] private Transform _ceilingCheck; // A position marking where to check for ceilings
+        [NotNull] private Transform _floorMetalCheck; // A position marking where to check for underfoot metal
+        [NotNull] private Transform _rearMetalCheck; // A position marking where to check for metal behind
+        [NotNull] private Transform _frontMetalCheck; // A position marking where to check for metal in front
         [NotNull] private Animator _anim; // Reference to the player's animator component.
         [NotNull] private Rigidbody2D _rigidBody2D;
         // ReSharper restore NotNullMemberIsNotInitialized
@@ -125,10 +129,13 @@ namespace UnitySampleAssets._2D
 
         private bool _facingRight = true;
         private bool _grounded;
+        private bool _isMetalUnderfoot;
+        private bool _isMetalInFront;
+        private bool _isMetalBehind;
+        private bool _isMetalAbove;
         [CanBeNull] private Collider2D _closestMetalSource;
         [CanBeNull] private Collider2D _activeMetal;
         private MagnetAction _magnetAction;
-        private readonly List<Collision2D> _collisions = new List<Collision2D>();
 
 
         /*
@@ -140,6 +147,9 @@ namespace UnitySampleAssets._2D
             // Setting up references.
             this._groundCheck = this.transform.Find("GroundCheck");
             this._ceilingCheck = this.transform.Find("CeilingCheck");
+            this._floorMetalCheck = this.transform.Find("FloorMetalCheck");
+            this._frontMetalCheck = this.transform.Find("FrontMetalCheck");
+            this._rearMetalCheck = this.transform.Find("RearMetalCheck");
             this._anim = this.GetComponent<Animator>();
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
@@ -153,6 +163,22 @@ namespace UnitySampleAssets._2D
                 this._groundCheck.position,
                 PlatformerCharacter2D.GroundedRadius,
                 this._whatIsGround);
+            this._isMetalUnderfoot = Physics2D.OverlapCircle(
+                this._floorMetalCheck.position,
+                PlatformerCharacter2D.MetalRadius,
+                this._whatIsMetal);
+            this._isMetalInFront = Physics2D.OverlapCircle(
+                this._frontMetalCheck.position,
+                PlatformerCharacter2D.MetalRadius,
+                this._whatIsMetal);
+            this._isMetalBehind = Physics2D.OverlapCircle(
+                this._rearMetalCheck.position,
+                PlatformerCharacter2D.MetalRadius,
+                this._whatIsMetal);
+            this._isMetalAbove = Physics2D.OverlapCircle(
+                this._ceilingCheck.position,
+                PlatformerCharacter2D.MetalRadius,
+                this._whatIsMetal);
             this._anim.SetBool("Ground", this._grounded);
 
             // Set the vertical animation
@@ -168,8 +194,6 @@ namespace UnitySampleAssets._2D
         {
             var debug = new StringWriter();
             var forces = new List<Vector2>();
-            var isTouchingMetal = this._collisions
-                .Any(x => this._whatIsMetal == (this._whatIsMetal | (1 << x.gameObject.layer)));
 
             this._closestMetalSource =
                 PlatformerCharacter2D.DetectMetal(
@@ -270,9 +294,10 @@ namespace UnitySampleAssets._2D
             switch (this._magnetAction)
             {
                 case MagnetAction.Pull when this._activeMetal != null:
-                    if (isTouchingMetal)
+                    if (this._isMetalUnderfoot || this._isMetalAbove || this._isMetalInFront || this._isMetalBehind)
                     {
                         this._rigidBody2D.velocity = Vector2.zero;
+                        this._rigidBody2D.gravityScale = 0f;
                         forces.Clear();
                     }
                     else
@@ -309,8 +334,10 @@ namespace UnitySampleAssets._2D
 
             var force = forces.Aggregate(Vector2.zero, (x, y) => x + y);
             var effectiveForce = force + (Vector2)Physics.gravity;
-            //debug.WriteLine($"ActiveMetal: {this._activeMetal?.GetInstanceID()}");
-            debug.WriteLine($"IsTouchingMetal: {isTouchingMetal.ToString()}");
+            debug.WriteLine($"ActiveMetal: {this._activeMetal?.GetInstanceID()}");
+            debug.WriteLine($"IsMetalUnderfoot: {this._isMetalUnderfoot.ToString()}");
+            debug.WriteLine($"IsMetalInFront: {this._isMetalInFront.ToString()}");
+            debug.WriteLine($"IsMetalAbove: {this._isMetalAbove.ToString()}");
             Debug.DrawRay(this.transform.position, effectiveForce, Color.green);
 
             this._rigidBody2D.AddForce(force);
