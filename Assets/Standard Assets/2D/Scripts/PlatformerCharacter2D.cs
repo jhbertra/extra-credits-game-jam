@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 
 namespace UnitySampleAssets._2D
 {
@@ -9,6 +10,7 @@ namespace UnitySampleAssets._2D
 
         [SerializeField] private float maxSpeed = 10f; // The fastest the player can travel in the x axis.
         [SerializeField] private float jumpForce = 400f; // Amount of force added when the player jumps.
+        [SerializeField] private float jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
 
         [Range(0, 1)] [SerializeField] private float crouchSpeed = .36f;
                                                      // Amount of maxSpeed applied to crouching movement. 1 = 100%
@@ -22,6 +24,7 @@ namespace UnitySampleAssets._2D
         private Transform ceilingCheck; // A position marking where to check for ceilings
         private float ceilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         private Animator anim; // Reference to the player's animator component.
+        private Rigidbody2D _rigidBody2d;
 
 
         private void Awake()
@@ -30,6 +33,7 @@ namespace UnitySampleAssets._2D
             groundCheck = transform.Find("GroundCheck");
             ceilingCheck = transform.Find("CeilingCheck");
             anim = GetComponent<Animator>();
+            this._rigidBody2d = this.GetComponent<Rigidbody2D>();
         }
 
 
@@ -40,11 +44,11 @@ namespace UnitySampleAssets._2D
             anim.SetBool("Ground", grounded);
 
             // Set the vertical animation
-            anim.SetFloat("vSpeed", this.GetComponent<Rigidbody2D>().velocity.y);
+            anim.SetFloat("vSpeed", this._rigidBody2d.velocity.y);
         }
 
 
-        public void Move(float move, bool crouch, bool jump)
+        public void Move(float move, bool crouch, bool jump, bool jumpHold)
         {
 
 
@@ -69,7 +73,7 @@ namespace UnitySampleAssets._2D
                 anim.SetFloat("Speed", Mathf.Abs(move));
 
                 // Move the character
-                this.GetComponent<Rigidbody2D>().velocity = new Vector2(move*maxSpeed, this.GetComponent<Rigidbody2D>().velocity.y);
+                this._rigidBody2d.velocity = new Vector2(move*maxSpeed, this._rigidBody2d.velocity.y);
 
                 // If the input is moving the player right and the player is facing left...
                 if (move > 0 && !facingRight)
@@ -86,7 +90,12 @@ namespace UnitySampleAssets._2D
                 // Add a vertical force to the player.
                 grounded = false;
                 anim.SetBool("Ground", false);
-                this.GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
+                this._rigidBody2d.AddForce(new Vector2(0f, jumpForce));
+            }
+
+            if (!this.grounded && !jumpHold && this._rigidBody2d.velocity.y > 0)
+            {
+                this._rigidBody2d.velocity = new Vector2(this._rigidBody2d.velocity.x, this._rigidBody2d.velocity.y / this.jumpReleaseDamping);
             }
         }
 
