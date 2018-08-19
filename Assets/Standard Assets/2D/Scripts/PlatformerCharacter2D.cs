@@ -1,32 +1,55 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace UnitySampleAssets._2D
 {
-
     public class PlatformerCharacter2D : MonoBehaviour
     {
         private bool _facingRight = true; // For determining which way the player is currently facing.
 
-        [FormerlySerializedAs("maxSpeed")] [SerializeField] private float _maxSpeed = 10f; // The fastest the player can travel in the x axis.
-        [FormerlySerializedAs("jumpForce")] [SerializeField] private float _jumpForce = 400f; // Amount of force added when the player jumps.
-        [FormerlySerializedAs("jumpReleaseDamping")] [SerializeField] private float _jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
-        [FormerlySerializedAs("fallMultiplier")] [SerializeField] private float _fallMultiplier = 1f; // Amount of force added when the player jumps.
+        [FormerlySerializedAs("maxSpeed")] [SerializeField]
+        private float _maxSpeed = 10f; // The fastest the player can travel in the x axis.
 
-        [FormerlySerializedAs("crouchSpeed")] [Range(0, 1)] [SerializeField] private float _crouchSpeed = .36f;
-                                                     // Amount of maxSpeed applied to crouching movement. 1 = 100%
+        [FormerlySerializedAs("jumpForce")] [SerializeField]
+        private float _jumpForce = 400f; // Amount of force added when the player jumps.
 
-        [FormerlySerializedAs("airControl")] [SerializeField] private bool _airControl; // Whether or not a player can steer while jumping;
-        [FormerlySerializedAs("whatIsGround")] [SerializeField] private LayerMask _whatIsGround; // A mask determining what is ground to the character
+        [FormerlySerializedAs("jumpReleaseDamping")] [SerializeField]
+        private float _jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
+
+        [FormerlySerializedAs("fallMultiplier")] [SerializeField]
+        private float _fallMultiplier = 1f; // Amount of force added when the player jumps.
+
+        [SerializeField] private int magnetismRange = 5;
+        [SerializeField] private float magnetismSpeed = 1.0f;
+
+        [FormerlySerializedAs("crouchSpeed")] [Range(0, 1)] [SerializeField]
+        private float _crouchSpeed = .36f;
+
+        // Amount of maxSpeed applied to crouching movement. 1 = 100%
+
+        [FormerlySerializedAs("airControl")] [SerializeField]
+        private bool _airControl; // Whether or not a player can steer while jumping;
+
+        [FormerlySerializedAs("whatIsGround")] [SerializeField]
+        private LayerMask _whatIsGround; // A mask determining what is ground to the character
+
+        [FormerlySerializedAs("whatIsGround")] [SerializeField]
+        private LayerMask _whatIsMetal; // A mask determining what is ground to the character
 
         private const float GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
-        private const float CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
+
+        private const float
+            CeilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
+
         private Transform _groundCheck; // A position marking where to check if the player is grounded.
         private bool _grounded; // Whether or not the player is grounded.
         private Transform _ceilingCheck; // A position marking where to check for ceilings
         private Animator _anim; // Reference to the player's animator component.
-        private Rigidbody2D _rigidBody2D;
+        private Rigidbody2D _rigidBody2d;
         private float _baseGravityScale;
+
+        private Transform _closestMetalSource;
 
 
         private void Awake()
@@ -35,19 +58,20 @@ namespace UnitySampleAssets._2D
             this._groundCheck = this.transform.Find("GroundCheck");
             this._ceilingCheck = this.transform.Find("CeilingCheck");
             this._anim = this.GetComponent<Animator>();
-            this._rigidBody2D = this.GetComponent<Rigidbody2D>();
-            this._baseGravityScale = this._rigidBody2D.gravityScale;
+            this._rigidBody2d = this.GetComponent<Rigidbody2D>();
+            this._baseGravityScale = this._rigidBody2d.gravityScale;
         }
 
 
         private void FixedUpdate()
         {
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-            this._grounded = Physics2D.OverlapCircle(this._groundCheck.position, PlatformerCharacter2D.GroundedRadius, this._whatIsGround);
+            this._grounded = Physics2D.OverlapCircle(this._groundCheck.position, PlatformerCharacter2D.GroundedRadius,
+                this._whatIsGround);
             this._anim.SetBool("Ground", this._grounded);
 
             // Set the vertical animation
-            this._anim.SetFloat("vSpeed", this._rigidBody2D.velocity.y);
+            this._anim.SetFloat("vSpeed", this._rigidBody2d.velocity.y);
         }
 
 
@@ -61,12 +85,14 @@ namespace UnitySampleAssets._2D
             bool pull,
             bool pullHold)
         {
+            this._closestMetalSource = this.DetectMetal();
 
             // If crouching, check to see if the character can stand up
             if (!crouch && this._anim.GetBool("Crouch"))
             {
                 // If the character has a ceiling preventing them from standing up, keep them crouching
-                if (Physics2D.OverlapCircle(this._ceilingCheck.position, PlatformerCharacter2D.CeilingRadius, this._whatIsGround))
+                if (Physics2D.OverlapCircle(this._ceilingCheck.position, PlatformerCharacter2D.CeilingRadius,
+                    this._whatIsGround))
                 {
                     crouch = true;
                 }
@@ -79,17 +105,18 @@ namespace UnitySampleAssets._2D
             if (this._grounded || this._airControl)
             {
                 // Reduce the speed if crouching by the crouchSpeed multiplier
-                move = (crouch ? move* this._crouchSpeed : move);
+                move = (crouch ? move * this._crouchSpeed : move);
 
                 // The Speed animator parameter is set to the absolute value of the horizontal input.
                 this._anim.SetFloat("Speed", Mathf.Abs(move));
 
                 // Move the character
-                this._rigidBody2D.velocity = new Vector2(move * this._maxSpeed, this._rigidBody2D.velocity.y);
+                this._rigidBody2d.velocity = new Vector2(move * this._maxSpeed, this._rigidBody2d.velocity.y);
 
                 // If the input is moving the player right and the player is facing left...
                 if (move > 0 && !this._facingRight
                     || move < 0 && this._facingRight)
+
                     // ... flip the player.
                 {
                     // Switch the way the player is labelled as facing.
@@ -101,28 +128,39 @@ namespace UnitySampleAssets._2D
                     this.transform.localScale = theScale;
                 }
             }
+
             // If the player should jump...
             if (this._grounded && jump && this._anim.GetBool("Ground"))
             {
                 // Add a vertical force to the player.
                 this._grounded = false;
                 this._anim.SetBool("Ground", false);
-                this._rigidBody2D.AddForce(new Vector2(0f, this._jumpForce));
+                this._rigidBody2d.AddForce(new Vector2(0f, this._jumpForce));
             }
 
-            if (!this._grounded && !jumpHold && this._rigidBody2D.velocity.y > 0)
+            if (!this._grounded && !jumpHold && this._rigidBody2d.velocity.y > 0)
             {
-                this._rigidBody2D.velocity = new Vector2(this._rigidBody2D.velocity.x, this._rigidBody2D.velocity.y / this._jumpReleaseDamping);
+                this._rigidBody2d.velocity = new Vector2(this._rigidBody2d.velocity.x,
+                    this._rigidBody2d.velocity.y / this._jumpReleaseDamping);
             }
 
-            if (this._rigidBody2D.velocity.y <= 0f)
+            if (this._rigidBody2d.velocity.y <= 0f)
             {
-                this._rigidBody2D.gravityScale = this._baseGravityScale * this._fallMultiplier;
+                this._rigidBody2d.gravityScale = this._baseGravityScale * this._fallMultiplier;
             }
             else
             {
-                this._rigidBody2D.gravityScale = this._baseGravityScale;
+                this._rigidBody2d.gravityScale = this._baseGravityScale;
             }
         }
+
+        private Transform DetectMetal()
+        {
+            return Physics2D
+                .OverlapCircleAll(transform.position, magnetismRange, this._whatIsMetal)
+                .Select(x => x.transform)
+                .FirstOrDefault();
+        }
     }
+
 }
