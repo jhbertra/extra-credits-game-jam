@@ -225,7 +225,7 @@ Prefab:
     - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
         type: 2}
       propertyPath: _magnetForce
-      value: 300
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
         type: 2}
@@ -236,6 +236,11 @@ Prefab:
         type: 2}
       propertyPath: _minPullSpeed
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
+        type: 2}
+      propertyPath: _jumpReleaseDamping
+      value: 40
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 839431bc93df24512ad33ded8594ce78, type: 2}
