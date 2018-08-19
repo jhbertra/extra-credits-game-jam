@@ -8,6 +8,7 @@ namespace Scripts.Components
         public float Horizontal;
         public float Vertical;
         public bool IsJump;
+        public bool IsJumpHeld;
         public bool IsPush;
         public bool IsPull;
 

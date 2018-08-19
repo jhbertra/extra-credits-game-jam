@@ -18,7 +18,8 @@ namespace Scripts.Systems
             {
                 entity.Input.Horizontal = Input.GetAxis(Constants.HorizontalAxis);
                 entity.Input.Vertical = Input.GetAxis(Constants.VerticalAxis);
-                entity.Input.IsJump = Input.GetButton(Constants.JumpKey);
+                entity.Input.IsJump = Input.GetButtonDown(Constants.JumpButton);
+                entity.Input.IsJumpHeld = Input.GetButton(Constants.JumpButton);
                 // entity.Input.IsPush = Input.GetButton(Constants.PushKey);
                 // entity.Input.IsPull = Input.GetButton(Constants.PullKey);
             }
