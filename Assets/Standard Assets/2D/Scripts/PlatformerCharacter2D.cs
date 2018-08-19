@@ -117,6 +117,7 @@ namespace UnitySampleAssets._2D
         [NotNull] private Transform _floorMetalCheck; // A position marking where to check for underfoot metal
         [NotNull] private Transform _rearMetalCheck; // A position marking where to check for metal behind
         [NotNull] private Transform _frontMetalCheck; // A position marking where to check for metal in front
+        [NotNull] private Transform _arm; // The transform of the arm
         [NotNull] private Animator _anim; // Reference to the player's animator component.
         [NotNull] private Rigidbody2D _rigidBody2D;
         // ReSharper restore NotNullMemberIsNotInitialized
@@ -150,6 +151,7 @@ namespace UnitySampleAssets._2D
             this._floorMetalCheck = this.transform.Find("FloorMetalCheck");
             this._frontMetalCheck = this.transform.Find("FrontMetalCheck");
             this._rearMetalCheck = this.transform.Find("RearMetalCheck");
+            this._arm = this.transform.Find("Arm");
             this._anim = this.GetComponent<Animator>();
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
@@ -183,6 +185,18 @@ namespace UnitySampleAssets._2D
 
             // Set the vertical animation
             this._anim.SetFloat("vSpeed", this._rigidBody2D.velocity.y);
+        }
+
+
+        public void SetArmX(float x)
+        {
+            this._arm.localPosition = new Vector2(x, this._arm.localPosition.y);
+        }
+
+
+        public void SetArmY(float y)
+        {
+            this._arm.localPosition = new Vector2(this._arm.localPosition.x, y);
         }
 
 
