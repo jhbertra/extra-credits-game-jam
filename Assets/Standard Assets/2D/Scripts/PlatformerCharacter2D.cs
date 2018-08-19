@@ -27,6 +27,7 @@ namespace UnitySampleAssets._2D
 
         [FormerlySerializedAs("fallMultiplier")] [SerializeField]
         private float _fallMultiplier = 1f; // Amount of force added when the player jumps.
+        [SerializeField]private float _minPullSpeed;
 
         [SerializeField] private float _pulseForce = 400f; // Amount of force added when the player jumps.
 
@@ -181,8 +182,12 @@ namespace UnitySampleAssets._2D
 
             if (this._magnetAction == MagnetAction.Pull && this._closestMetalSource != null)
             {
-                var effectVector = (this._closestMetalSource.position - this.transform.position);
-                this._rigidBody2d.velocity = effectVector * this._magnetForce * Time.deltaTime;
+                var effectVector = this._closestMetalSource.position - this.transform.position;
+                var minSpeed = effectVector.normalized * this._minPullSpeed;
+                var speedVector = Vector2.Distance(Vector2.zero, effectVector) > Vector2.Distance(Vector2.zero, minSpeed)
+                    ? effectVector
+                    : minSpeed;
+                this._rigidBody2d.velocity = speedVector * this._magnetForce * Time.deltaTime;
             }
 
             // if ((this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
