@@ -329,26 +329,15 @@ namespace UnitySampleAssets._2D
                     }
                     break;
 
-                //case MagnetAction.Push when this._activeMetal != null && push:
-                //    this._rigidBody2D.velocity =
-                //        PlatformerCharacter2D.GetInitialPushVelocity(
-                //            this._activeMetal,
-                //            this.transform.position,
-                //            this._magnetForce);
-                //    this._grounded = false;
-                //    this._anim.SetBool("Ground", false);
-
-                //    break;
-
-                //case MagnetAction.Push when this._activeMetal != null:
-                //    var continuousPushForce = PlatformerCharacter2D.GetContinuousPushForce(
-                //        this._activeMetal,
-                //        this.transform.position,
-                //        this._magnetForce);
-                //    Debug.DrawRay(this.transform.position, continuousPushForce, Color.green);
-                //    this._rigidBody2D.AddForce(
-                //        continuousPushForce);
-                //    break;
+                case MagnetAction.Push:
+                    forces.Add(
+                        PlatformerCharacter2D.GetInitialPushForce(
+                            this._activeMetal,
+                            this.transform.position,
+                            this._magnetForce));
+                    this._grounded = false;
+                    this._anim.SetBool("Ground", false);
+                    break;
             }
 
             var armPos = this._arm.position;
@@ -396,13 +385,13 @@ namespace UnitySampleAssets._2D
             Vector3 playerPosition,
             float force)
         {
-            var direction = GetInitialPushVelocity(metalSource, playerPosition, force).normalized;
+            var direction = PlatformerCharacter2D.GetInitialPushForce(metalSource, playerPosition, force).normalized;
             var distance = math.abs(Vector2.Distance(playerPosition, metalSource.transform.position));
             var effectiveForce = 1f / math.sqrt(distance) * force;
             return direction * effectiveForce * 0.01f;
         }
 
-        private static Vector2 GetInitialPushVelocity(
+        private static Vector2 GetInitialPushForce(
             [NotNull] Collider2D metalSource,
             Vector2 playerPosition,
             float force)
@@ -412,7 +401,7 @@ namespace UnitySampleAssets._2D
                 playerPosition.x < box.min.x ? -1f : (playerPosition.x >= box.max.x ? 1f : 0f),
                 playerPosition.y > box.min.y ? 1f : (playerPosition.y <= box.max.y ? -1f : 0f));
 
-            return forceDir.normalized * force * Time.deltaTime;
+            return forceDir.normalized * force;
         }
 
         private static Vector2 GetPullForce(
