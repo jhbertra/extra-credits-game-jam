@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 23383410730494348}
   - component: {fileID: 114500726508547818}
   - component: {fileID: 61517404953685234}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LongBarMagnetic 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,7 +37,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1270112858798924}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.68, y: -0.66196597, z: -0.24513309}
+  m_LocalPosition: {x: 6.9036303, y: -0.9500005, z: -0.24513309}
   m_LocalScale: {x: 4.191287, y: 0.4625, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
