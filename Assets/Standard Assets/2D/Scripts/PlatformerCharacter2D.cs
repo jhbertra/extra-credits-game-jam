@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
@@ -24,6 +26,18 @@ namespace UnitySampleAssets._2D
         /// </summary>
         [FormerlySerializedAs("maxSpeed")] [SerializeField]
         private float _maxSpeed = 10f;
+
+        /// <summary>
+        /// The rate of positive change of horizonal speed
+        /// </summary>
+        [FormerlySerializedAs("maxSpeed")] [SerializeField]
+        private float _positiveAcceleration = 10f;
+
+        /// <summary>
+        /// The rate of positive change of horizonal speed
+        /// </summary>
+        [FormerlySerializedAs("maxSpeed")] [SerializeField]
+        private float _negativeAcceleration = 10f;
 
         /// <summary>
         /// The force applied when jumping
@@ -114,6 +128,7 @@ namespace UnitySampleAssets._2D
         private bool _facingRight = true;
         private bool _grounded;
         [CanBeNull] private Collider2D _closestMetalSource;
+        [CanBeNull] private Collider2D _activeMetal;
         private MagnetAction _magnetAction;
 
 
@@ -153,12 +168,15 @@ namespace UnitySampleAssets._2D
         public void Move(float move, bool crouch, bool jump, bool jumpHold, bool push, bool pushHold, bool pull)
         {
             var debug = new StringWriter();
+            var forces = new List<Vector2>();
 
             this._closestMetalSource =
                 PlatformerCharacter2D.DetectMetal(
                     this.transform.position,
                     this._magnetRange,
                     this._whatIsMetal);
+
+            var targetVelocity = this._maxSpeed * move;
 
             Debug.DrawRay(this.transform.position, Vector2.left * this._magnetRange, Color.red);
             Debug.DrawRay(this.transform.position, Vector2.right * this._magnetRange, Color.red);
@@ -188,8 +206,14 @@ namespace UnitySampleAssets._2D
                 // The Speed animator parameter is set to the absolute value of the horizontal input.
                 this._anim.SetFloat("Speed", Mathf.Abs(move));
 
+                var baseAcceleration = Vector2.right * (targetVelocity - this._rigidBody2D.velocity.x);
+                var acceleration = Math.Sign(baseAcceleration.x) != Math.Sign(this._rigidBody2D.velocity.x)
+                    ? this._negativeAcceleration
+                    : this._positiveAcceleration;
+                forces.Add(baseAcceleration * acceleration);
+
                 // Move the character
-                this._rigidBody2D.velocity = new Vector2(move * this._maxSpeed, this._rigidBody2D.velocity.y);
+                //this._rigidBody2D.velocity = new Vector2(move * this._maxSpeed, this._rigidBody2D.velocity.y);
 
                 // If the input is moving the player right and the player is facing left...
                 if (move > 0 && !this._facingRight
@@ -207,58 +231,79 @@ namespace UnitySampleAssets._2D
                 }
             }
 
-            // If the player should jump...
-            if (this._grounded && jump && this._anim.GetBool("Ground"))
-            {
-                // Add a vertical force to the player.
-                this._grounded = false;
-                this._anim.SetBool("Ground", false);
-                this._rigidBody2D.velocity = new Vector2(this._rigidBody2D.velocity.x, 15f);
-            }
+            //
+            // // If the player should jump...
+            // if (this._grounded && jump && this._anim.GetBool("Ground"))
+            // {
+            //     // Add a vertical force to the player.
+            //     this._grounded = false;
+            //     this._anim.SetBool("Ground", false);
+            //     this._rigidBody2D.velocity = new Vector2(this._rigidBody2D.velocity.x, this._jumpForce * Time.deltaTime);
+            // }
+            //
+            // if (!this._grounded && !jumpHold && !pushHold && this._rigidBody2D.velocity.y > 0)
+            // {
+            //     this._rigidBody2D.velocity = new Vector2(this._rigidBody2D.velocity.x,
+            //         this._rigidBody2D.velocity.y - this._jumpReleaseDecrement);
+            // }
+            //
+            // this._rigidBody2D.gravityScale = this._rigidBody2D.velocity.y <= 0f
+            //     ? this._baseGravityScale * this._fallMultiplier
+            //     : this._baseGravityScale;
+            //
+            // if (pushHold || pull)
+            // {
+            //     if (this._magnetAction == MagnetAction.Nothing)
+            //     {
+            //         this._magnetAction = pushHold
+            //             ? MagnetAction.Push
+            //             : MagnetAction.Pull;
+            //         this._activeMetal = this._closestMetalSource;
+            //     }
+            // }
+            // else
+            // {
+            //     this._magnetAction = MagnetAction.Nothing;
+            //     this._activeMetal = null;
+            // }
+            //
+            // switch (this._magnetAction)
+            // {
+            //     case MagnetAction.Pull when this._activeMetal != null:
+            //         this._rigidBody2D.velocity =
+            //             PlatformerCharacter2D.GetPullVelocity(
+            //                 this._activeMetal.transform.position,
+            //                 this.transform.position,
+            //                 this._magnetForce);
+            //         break;
+            //
+            //     case MagnetAction.Push when this._activeMetal != null && push:
+            //         this._rigidBody2D.velocity =
+            //             PlatformerCharacter2D.GetInitialPushVelocity(
+            //                 this._activeMetal,
+            //                 this.transform.position,
+            //                 this._magnetForce);
+            //         this._grounded = false;
+            //         this._anim.SetBool("Ground", false);
+            //
+            //         break;
+            //
+            //     case MagnetAction.Push when this._activeMetal != null:
+            //         var continuousPushForce = PlatformerCharacter2D.GetContinuousPushForce(
+            //             this._activeMetal,
+            //             this.transform.position,
+            //             this._magnetForce);
+            //         Debug.DrawRay(this.transform.position, continuousPushForce, Color.green);
+            //         this._rigidBody2D.AddForce(
+            //             continuousPushForce);
+            //         break;
+            // }
 
-            if (!this._grounded && !jumpHold && !pushHold && this._rigidBody2D.velocity.y > 0)
-            {
-                this._rigidBody2D.velocity = new Vector2(this._rigidBody2D.velocity.x,
-                    this._rigidBody2D.velocity.y - this._jumpReleaseDecrement);
-            }
+            var force = forces.Aggregate(Vector2.zero, (x, y) => x + y);
+            debug.WriteLine($"ActiveMetal: {this._activeMetal?.GetInstanceID()}");
+            Debug.DrawRay(this.transform.position, force, Color.green);
 
-            this._rigidBody2D.gravityScale = this._rigidBody2D.velocity.y <= 0f
-                ? this._baseGravityScale * this._fallMultiplier
-                : this._baseGravityScale;
-
-            if (pushHold || pull && this._magnetAction != MagnetAction.Nothing)
-            {
-                this._magnetAction = pushHold
-                    ? MagnetAction.Push
-                    : MagnetAction.Pull;
-            }
-            else
-            {
-                this._magnetAction = MagnetAction.Nothing;
-            }
-
-            switch (this._magnetAction)
-            {
-                case MagnetAction.Pull when this._closestMetalSource != null:
-                    this._rigidBody2D.velocity =
-                        PlatformerCharacter2D.GetPullVelocity(
-                            this._closestMetalSource.transform.position,
-                            this.transform.position,
-                            this._magnetForce);
-                    break;
-
-                case MagnetAction.Push when this._closestMetalSource != null && push:
-                    this._rigidBody2D.velocity =
-                        PlatformerCharacter2D.GetInitialPushVelocity(
-                            this._closestMetalSource,
-                            this.transform.position,
-                            15f);
-                    this._grounded = false;
-                    this._anim.SetBool("Ground", false);
-
-                    break;
-            }
-
+            this._rigidBody2D.AddForce(force);
             this._debug.text = debug.ToString();
         }
 
@@ -274,6 +319,17 @@ namespace UnitySampleAssets._2D
                 .FirstOrDefault();
         }
 
+        private static Vector2 GetContinuousPushForce(
+            [NotNull] Collider2D metalSource,
+            Vector3 playerPosition,
+            float force)
+        {
+            var direction = GetInitialPushVelocity(metalSource, playerPosition, force).normalized;
+            var distance = math.abs(Vector2.Distance(playerPosition, metalSource.transform.position));
+            var effectiveForce = 1f / math.sqrt(distance) * force;
+            return direction * effectiveForce * 0.01f;
+        }
+
         private static Vector2 GetInitialPushVelocity(
             [NotNull] Collider2D metalSource,
             Vector2 playerPosition,
@@ -284,7 +340,7 @@ namespace UnitySampleAssets._2D
                 playerPosition.x < box.min.x ? -1f : (playerPosition.x >= box.max.x ? 1f : 0f),
                 playerPosition.y > box.min.y ? 1f : (playerPosition.y <= box.max.y ? -1f : 0f));
 
-            return forceDir.normalized * force;
+            return forceDir.normalized * force * Time.deltaTime;
         }
 
         private static Vector2 GetPullVelocity(
