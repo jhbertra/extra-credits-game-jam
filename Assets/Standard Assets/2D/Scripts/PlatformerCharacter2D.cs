@@ -24,6 +24,8 @@ namespace UnitySampleAssets._2D
         [FormerlySerializedAs("fallMultiplier")] [SerializeField]
         private float _fallMultiplier = 1f; // Amount of force added when the player jumps.
 
+        [SerializeField] private float _pulseMultiplier = 1f; // Amount of force added when the player jumps.
+
         [SerializeField] private int magnetismRange = 5;
         [SerializeField] private float magnetismSpeed = 1.0f;
 
@@ -172,6 +174,13 @@ namespace UnitySampleAssets._2D
 
             if (this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
             {
+                var force = jumpHold
+                    ? this._magnetForce * this._pulseMultiplier
+                    : this._magnetForce;
+                var range = jumpHold
+                    ? this.magnetismRange * this._pulseMultiplier
+                    : this.magnetismRange;
+
                 var affectVector = (this._affectedMetal.position - this.transform.position).normalized;
 
                 Debug.DrawRay(this.transform.position, affectVector, Color.cyan);
@@ -183,12 +192,12 @@ namespace UnitySampleAssets._2D
                         * -math.max(
                             0f,
                             math.lerp(
-                                this._magnetForce,
+                                force,
                                 0f,
                                 Vector2.Distance(
                                     this.transform.position,
                                     this._affectedMetal.position)
-                                / this.magnetismRange)));
+                                / range)));
                 }
             }
         }
