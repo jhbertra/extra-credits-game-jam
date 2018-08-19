@@ -34,9 +34,9 @@ namespace UnitySampleAssets._2D
         private void Awake()
         {
             // Setting up references.
-            groundCheck = transform.Find("GroundCheck");
-            ceilingCheck = transform.Find("CeilingCheck");
-            anim = GetComponent<Animator>();
+            this.groundCheck = this.transform.Find("GroundCheck");
+            this.ceilingCheck = this.transform.Find("CeilingCheck");
+            this.anim = this.GetComponent<Animator>();
             this._rigidBody2d = this.GetComponent<Rigidbody2D>();
             this.baseGravityScale = this._rigidBody2d.gravityScale;
         }
@@ -45,11 +45,11 @@ namespace UnitySampleAssets._2D
         private void FixedUpdate()
         {
             // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-            grounded = Physics2D.OverlapCircle(groundCheck.position, groundedRadius, whatIsGround);
-            anim.SetBool("Ground", grounded);
+            this.grounded = Physics2D.OverlapCircle(this.groundCheck.position, this.groundedRadius, this.whatIsGround);
+            this.anim.SetBool("Ground", this.grounded);
 
             // Set the vertical animation
-            anim.SetFloat("vSpeed", this._rigidBody2d.velocity.y);
+            this.anim.SetFloat("vSpeed", this._rigidBody2d.velocity.y);
         }
 
 
@@ -58,44 +58,44 @@ namespace UnitySampleAssets._2D
 
 
             // If crouching, check to see if the character can stand up
-            if (!crouch && anim.GetBool("Crouch"))
+            if (!crouch && this.anim.GetBool("Crouch"))
             {
                 // If the character has a ceiling preventing them from standing up, keep them crouching
-                if (Physics2D.OverlapCircle(ceilingCheck.position, ceilingRadius, whatIsGround))
+                if (Physics2D.OverlapCircle(this.ceilingCheck.position, this.ceilingRadius, this.whatIsGround))
                     crouch = true;
             }
 
             // Set whether or not the character is crouching in the animator
-            anim.SetBool("Crouch", crouch);
+            this.anim.SetBool("Crouch", crouch);
 
             //only control the player if grounded or airControl is turned on
-            if (grounded || airControl)
+            if (this.grounded || this.airControl)
             {
                 // Reduce the speed if crouching by the crouchSpeed multiplier
-                move = (crouch ? move*crouchSpeed : move);
+                move = (crouch ? move* this.crouchSpeed : move);
 
                 // The Speed animator parameter is set to the absolute value of the horizontal input.
-                anim.SetFloat("Speed", Mathf.Abs(move));
+                this.anim.SetFloat("Speed", Mathf.Abs(move));
 
                 // Move the character
-                this._rigidBody2d.velocity = new Vector2(move*maxSpeed, this._rigidBody2d.velocity.y);
+                this._rigidBody2d.velocity = new Vector2(move* this.maxSpeed, this._rigidBody2d.velocity.y);
 
                 // If the input is moving the player right and the player is facing left...
-                if (move > 0 && !facingRight)
+                if (move > 0 && !this.facingRight)
                     // ... flip the player.
-                    Flip();
+                    this.Flip();
                     // Otherwise if the input is moving the player left and the player is facing right...
-                else if (move < 0 && facingRight)
+                else if (move < 0 && this.facingRight)
                     // ... flip the player.
-                    Flip();
+                    this.Flip();
             }
             // If the player should jump...
-            if (grounded && jump && anim.GetBool("Ground"))
+            if (this.grounded && jump && this.anim.GetBool("Ground"))
             {
                 // Add a vertical force to the player.
-                grounded = false;
-                anim.SetBool("Ground", false);
-                this._rigidBody2d.AddForce(new Vector2(0f, jumpForce));
+                this.grounded = false;
+                this.anim.SetBool("Ground", false);
+                this._rigidBody2d.AddForce(new Vector2(0f, this.jumpForce));
             }
 
             if (!this.grounded && !jumpHold && this._rigidBody2d.velocity.y > 0)
@@ -117,12 +117,12 @@ namespace UnitySampleAssets._2D
         private void Flip()
         {
             // Switch the way the player is labelled as facing.
-            facingRight = !facingRight;
+            this.facingRight = !this.facingRight;
 
             // Multiply the player's x local scale by -1.
-            Vector3 theScale = transform.localScale;
+            Vector3 theScale = this.transform.localScale;
             theScale.x *= -1;
-            transform.localScale = theScale;
+            this.transform.localScale = theScale;
         }
 
         public void Attract(){
