@@ -228,9 +228,6 @@ namespace UnitySampleAssets._2D
                 // Reduce the speed if crouching by the crouchSpeed multiplier
                 move = (crouch ? move * this._crouchSpeed : move);
 
-                // The Speed animator parameter is set to the absolute value of the horizontal input.
-                this._anim.SetFloat("Speed", Mathf.Abs(move));
-
                 var baseAcceleration = Vector2.right * (targetVelocity - this._rigidBody2D.velocity.x);
                 var acceleration = Math.Sign(baseAcceleration.x) != Math.Sign(this._rigidBody2D.velocity.x)
                     ? this._negativeAcceleration
@@ -340,6 +337,8 @@ namespace UnitySampleAssets._2D
             debug.WriteLine($"IsMetalAbove: {this._isMetalAbove.ToString()}");
             Debug.DrawRay(this.transform.position, effectiveForce, Color.green);
 
+            // The Speed animator parameter is set to the absolute value of the horizontal input.
+            this._anim.SetFloat("Speed", Mathf.Abs(this._rigidBody2D.velocity.x));
             this._rigidBody2D.AddForce(force);
             this._debug.text = debug.ToString();
         }
