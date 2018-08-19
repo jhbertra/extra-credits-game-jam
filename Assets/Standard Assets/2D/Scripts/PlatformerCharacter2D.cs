@@ -172,7 +172,7 @@ namespace UnitySampleAssets._2D
 
             if (this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
             {
-                var affectVector = this._affectedMetal.position - this.transform.position;
+                var affectVector = (this._affectedMetal.position - this.transform.position).normalized;
 
                 Debug.DrawRay(this.transform.position, affectVector, Color.cyan);
 
@@ -189,9 +189,6 @@ namespace UnitySampleAssets._2D
                                     this.transform.position,
                                     this._affectedMetal.position)
                                 / this.magnetismRange)));
-
-                    this._grounded = false;
-                    this._anim.SetBool("Ground", false);
                 }
             }
         }
