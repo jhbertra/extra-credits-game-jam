@@ -11,6 +11,7 @@ namespace UnitySampleAssets._2D
         [SerializeField] private float maxSpeed = 10f; // The fastest the player can travel in the x axis.
         [SerializeField] private float jumpForce = 400f; // Amount of force added when the player jumps.
         [SerializeField] private float jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
+        [SerializeField] private float fallMultiplier = 1f; // Amount of force added when the player jumps.
 
         [Range(0, 1)] [SerializeField] private float crouchSpeed = .36f;
                                                      // Amount of maxSpeed applied to crouching movement. 1 = 100%
@@ -25,6 +26,7 @@ namespace UnitySampleAssets._2D
         private float ceilingRadius = .01f; // Radius of the overlap circle to determine if the player can stand up
         private Animator anim; // Reference to the player's animator component.
         private Rigidbody2D _rigidBody2d;
+        private float baseGravityScale;
 
 
         private void Awake()
@@ -34,6 +36,7 @@ namespace UnitySampleAssets._2D
             ceilingCheck = transform.Find("CeilingCheck");
             anim = GetComponent<Animator>();
             this._rigidBody2d = this.GetComponent<Rigidbody2D>();
+            this.baseGravityScale = this._rigidBody2d.gravityScale;
         }
 
 
@@ -96,6 +99,15 @@ namespace UnitySampleAssets._2D
             if (!this.grounded && !jumpHold && this._rigidBody2d.velocity.y > 0)
             {
                 this._rigidBody2d.velocity = new Vector2(this._rigidBody2d.velocity.x, this._rigidBody2d.velocity.y / this.jumpReleaseDamping);
+            }
+
+            if (this._rigidBody2d.velocity.y <= 0f)
+            {
+                this._rigidBody2d.gravityScale = this.baseGravityScale * this.fallMultiplier;
+            }
+            else
+            {
+                this._rigidBody2d.gravityScale = this.baseGravityScale;
             }
         }
 
