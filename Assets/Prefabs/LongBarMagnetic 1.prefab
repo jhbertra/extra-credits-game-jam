@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114500726508547818}
   - component: {fileID: 61517404953685234}
   m_Layer: 0
-  m_Name: LongBarMagnetic
+  m_Name: LongBarMagnetic 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

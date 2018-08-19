@@ -156,6 +156,10 @@ Prefab:
       propertyPath: m_Name
       value: LongBarMagnetic
       objectReference: {fileID: 0}
+    - target: {fileID: 1270112858798924, guid: debbb1fd8d83643cfb4815551e85b444, type: 2}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: debbb1fd8d83643cfb4815551e85b444, type: 2}
   m_IsPrefabAsset: 0

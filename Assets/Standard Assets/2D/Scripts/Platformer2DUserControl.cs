@@ -9,6 +9,8 @@ namespace UnitySampleAssets._2D
         private PlatformerCharacter2D character;
         private bool jump;
         private bool jumpHold;
+        public bool push;
+        public bool pushHold;
 
         private void Awake()
         {
@@ -21,6 +23,8 @@ namespace UnitySampleAssets._2D
             // Read the jump input in Update so button presses aren't missed.
             jump = Input.GetButtonDown("Jump");
             this.jumpHold = Input.GetButton("Jump");
+            push = Input.GetButtonDown("Push");
+            this.pushHold = Input.GetButton("Push");
         }
 
         private void FixedUpdate()
