@@ -1,12 +1,16 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace UnitySampleAssets._2D
 {
     public class PlatformerCharacter2D : MonoBehaviour
     {
+        public Text _debug;
+
         private bool _facingRight = true; // For determining which way the player is currently facing.
 
         [FormerlySerializedAs("maxSpeed")] [SerializeField]
@@ -56,7 +60,6 @@ namespace UnitySampleAssets._2D
         private float _baseGravityScale;
 
         private Transform _closestMetalSource;
-        private Transform _affectedMetal;
         private MagnetAction _magnetAction;
 
 
@@ -91,7 +94,13 @@ namespace UnitySampleAssets._2D
             bool push,
             bool pull)
         {
+            var debug = new StringWriter();
             this._closestMetalSource = this.DetectMetal();
+
+            Debug.DrawRay(this.transform.position, Vector2.left * this.magnetismRange, Color.red);
+            Debug.DrawRay(this.transform.position, Vector2.right * this.magnetismRange, Color.red);
+            Debug.DrawRay(this.transform.position, Vector2.up * this.magnetismRange, Color.red);
+            Debug.DrawRay(this.transform.position, Vector2.down * this.magnetismRange, Color.red);
 
             // If crouching, check to see if the character can stand up
             if (!crouch && this._anim.GetBool("Crouch"))
@@ -108,7 +117,7 @@ namespace UnitySampleAssets._2D
             this._anim.SetBool("Crouch", crouch);
 
             //only control the player if grounded or airControl is turned on
-            if (this._grounded || this._airControl)
+            if ((this._grounded || this._airControl) && this._magnetAction != MagnetAction.Pull)
             {
                 // Reduce the speed if crouching by the crouchSpeed multiplier
                 move = (crouch ? move * this._crouchSpeed : move);
@@ -159,35 +168,48 @@ namespace UnitySampleAssets._2D
                 this._rigidBody2d.gravityScale = this._baseGravityScale;
             }
 
-            if (push || pull && this._magnetAction == MagnetAction.Nothing)
+            if (push || pull && this._closestMetalSource != null)
             {
-                this._affectedMetal = this._closestMetalSource;
                 this._magnetAction = push
                     ? MagnetAction.Push
                     : MagnetAction.Pull;
             }
-            else if (!push && !pull)
+            else
             {
-                this._affectedMetal = null;
                 this._magnetAction = MagnetAction.Nothing;
             }
 
-            if (this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
+            if (this._magnetAction == MagnetAction.Pull && this._closestMetalSource != null)
             {
-                var force = this._magnetForce;
-                var range = this.magnetismRange;
-
-                var effectVector = (this._affectedMetal.position - this.transform.position).normalized;
-
-                Debug.DrawRay(this.transform.position, effectVector, Color.cyan);
-
-                var effectDir = this._magnetAction == MagnetAction.Push ? -1 : 1;
-                this._rigidBody2d.AddForce(effectVector * effectDir * force);
-                if (jump)
-                {
-                    this._rigidBody2d.AddForce(effectVector * this._pulseForce * effectDir);
-                }
+                var effectVector = (this._closestMetalSource.position - this.transform.position);
+                this._rigidBody2d.velocity = effectVector * this._magnetForce * Time.deltaTime;
             }
+
+            // if ((this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
+            //     && this._closestMetalSource != null)
+            // {
+            //     var force = math.max(
+            //         this._magnetForce * 0.5f,
+            //         math.lerp(
+            //             this._magnetForce,
+            //             0f,
+            //             math.abs(Vector2.Distance(this.transform.position, this._closestMetalSource.position)) / this.magnetismRange));
+            //
+            //     debug.WriteLine($"force: {force}");
+            //
+            //     var effectVector = (this._closestMetalSource.position - this.transform.position).normalized;
+            //
+            //     Debug.DrawRay(this.transform.position, effectVector, Color.cyan);
+            //
+            //     var effectDir = this._magnetAction == MagnetAction.Push ? -1 : 1;
+            //     this._rigidBody2d.AddForce(effectVector * effectDir * force);
+            //     if (jump)
+            //     {
+            //         this._rigidBody2d.AddForce(effectVector * this._pulseForce * effectDir);
+            //     }
+            // }
+
+            this._debug.text = debug.ToString();
         }
 
         private Transform DetectMetal()
