@@ -204,7 +204,15 @@ namespace UnitySampleAssets._2D
          * Public interface
          */
 
-        public void Move(float move, bool crouch, bool jump, bool jumpHold, bool push, bool pushHold, bool pull)
+        public void Move(
+            float horizontal,
+            float vertical,
+            bool crouch,
+            bool jump,
+            bool jumpHold,
+            bool push,
+            bool pushHold,
+            bool pull)
         {
             var debug = new StringWriter();
             var forces = new List<Vector2>();
@@ -215,7 +223,7 @@ namespace UnitySampleAssets._2D
                     this._magnetRange,
                     this._whatIsMetal);
 
-            var targetVelocity = this._maxSpeed * move;
+            var targetVelocity = this._maxSpeed * horizontal;
 
             Debug.DrawRay(this.transform.position, Vector2.left * this._magnetRange, Color.red);
             Debug.DrawRay(this.transform.position, Vector2.right * this._magnetRange, Color.red);
@@ -240,7 +248,7 @@ namespace UnitySampleAssets._2D
             if ((this._grounded || this._airControl) && this._magnetAction != MagnetAction.Pull)
             {
                 // Reduce the speed if crouching by the crouchSpeed multiplier
-                move = (crouch ? move * this._crouchSpeed : move);
+                horizontal = (crouch ? horizontal * this._crouchSpeed : horizontal);
 
                 var baseAcceleration = Vector2.right * (targetVelocity - this._rigidBody2D.velocity.x);
                 var acceleration = Math.Sign(baseAcceleration.x) != Math.Sign(this._rigidBody2D.velocity.x)
@@ -252,8 +260,8 @@ namespace UnitySampleAssets._2D
                 //this._rigidBody2D.velocity = new Vector2(move * this._maxSpeed, this._rigidBody2D.velocity.y);
 
                 // If the input is moving the player right and the player is facing left...
-                if (move > 0 && !this._facingRight
-                    || move < 0 && this._facingRight)
+                if (horizontal > 0 && !this._facingRight
+                    || horizontal < 0 && this._facingRight)
 
                     // ... flip the player.
                 {
@@ -342,6 +350,20 @@ namespace UnitySampleAssets._2D
                 //        continuousPushForce);
                 //    break;
             }
+
+            var armPos = this._arm.position;
+            var sign = this._facingRight ? 1 : -1;
+
+            var armTarget =
+                (this._activeMetal != null
+                    ? (Vector2) (this._activeMetal.transform.position - armPos)
+                    : math.abs(vertical) < float.Epsilon
+                        ? Vector2.right * sign
+                        : new Vector2(horizontal, vertical))
+                .normalized;
+
+            var armAngle = math.atan2(1f * sign, 0f) - math.atan2(armTarget.x, armTarget.y);
+            this._arm.transform.rotation = Quaternion.Euler(Vector3.forward * math.degrees(armAngle));
 
             var force = forces.Aggregate(Vector2.zero, (x, y) => x + y);
             var effectiveForce = force + (Vector2)Physics.gravity;

@@ -21,8 +21,10 @@ namespace UnitySampleAssets._2D
         private void Update()
         {
             if(!this._jump)
-            // Read the jump input in Update so button presses aren't missed.
-            this._jump = Input.GetButtonDown("Jump");
+            {
+                this._jump = Input.GetButtonDown("Jump");
+            }
+
             this._jumpHold = Input.GetButton("Jump");
             this._pushHold = Input.GetButton("Push");
             this._push = Input.GetButtonDown("Push");
@@ -32,11 +34,13 @@ namespace UnitySampleAssets._2D
         private void FixedUpdate()
         {
             // Read the inputs.
-            bool crouch = Input.GetKey(KeyCode.LeftControl);
-            float h = Input.GetAxis("Horizontal");
+            var crouch = Input.GetKey(KeyCode.LeftControl);
+            var h = Input.GetAxis("Horizontal");
+            var v = Input.GetAxis("Vertical");
             // Pass all parameters to the character control script.
             this._character.Move(
                 h,
+                v,
                 crouch,
                 this._jump,
                 this._jumpHold,
