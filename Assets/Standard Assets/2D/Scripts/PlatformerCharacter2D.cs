@@ -182,18 +182,7 @@ namespace UnitySampleAssets._2D
                 Debug.DrawRay(this.transform.position, effectVector, Color.cyan);
 
                 var effectDir = this._magnetAction == MagnetAction.Push ? -1 : 1;
-                this._rigidBody2d.AddForce(
-                    effectVector
-                    * effectDir
-                    * math.max(
-                        0f,
-                        math.lerp(
-                            force,
-                            0f,
-                            Vector2.Distance(
-                                this.transform.position,
-                                this._affectedMetal.position)
-                            / range)));
+                this._rigidBody2d.AddForce(effectVector * effectDir * force);
                 if (jump)
                 {
                     this._rigidBody2d.AddForce(effectVector * this._pulseForce * effectDir);
