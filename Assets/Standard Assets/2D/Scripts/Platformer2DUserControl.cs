@@ -10,6 +10,7 @@ namespace UnitySampleAssets._2D
         private bool _jump;
         private bool _jumpHold;
         private bool _push;
+        private bool _pushHold;
         private bool _pull;
 
         private void Awake()
@@ -23,7 +24,8 @@ namespace UnitySampleAssets._2D
             // Read the jump input in Update so button presses aren't missed.
             this._jump = Input.GetButtonDown("Jump");
             this._jumpHold = Input.GetButton("Jump");
-            this._push = Input.GetButton("Push");
+            this._pushHold = Input.GetButton("Push");
+            this._push = Input.GetButtonDown("Push");
             this._pull = Input.GetButton("Pull");
         }
 
@@ -39,6 +41,7 @@ namespace UnitySampleAssets._2D
                 this._jump,
                 this._jumpHold,
                 this._push,
+                this._pushHold,
                 this._pull);
             this._jump = false;
         }

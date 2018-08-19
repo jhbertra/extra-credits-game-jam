@@ -29,10 +29,7 @@ namespace UnitySampleAssets._2D
         private float _fallMultiplier = 1f; // Amount of force added when the player jumps.
         [SerializeField]private float _minPullSpeed;
 
-        [SerializeField] private float _pulseForce = 400f; // Amount of force added when the player jumps.
-
         [SerializeField] private int magnetismRange = 5;
-        [SerializeField] private float magnetismSpeed = 1.0f;
 
         [FormerlySerializedAs("crouchSpeed")] [Range(0, 1)] [SerializeField]
         private float _crouchSpeed = .36f;
@@ -60,7 +57,7 @@ namespace UnitySampleAssets._2D
         private Rigidbody2D _rigidBody2d;
         private float _baseGravityScale;
 
-        private Transform _closestMetalSource;
+        private Collider2D _closestMetalSource;
         private MagnetAction _magnetAction;
 
 
@@ -87,13 +84,7 @@ namespace UnitySampleAssets._2D
         }
 
 
-        public void Move(
-            float move,
-            bool crouch,
-            bool jump,
-            bool jumpHold,
-            bool push,
-            bool pull)
+        public void Move(float move, bool crouch, bool jump, bool jumpHold, bool push, bool pushHold, bool pull)
         {
             var debug = new StringWriter();
             this._closestMetalSource = this.DetectMetal();
@@ -151,10 +142,10 @@ namespace UnitySampleAssets._2D
                 // Add a vertical force to the player.
                 this._grounded = false;
                 this._anim.SetBool("Ground", false);
-                this._rigidBody2d.AddForce(new Vector2(0f, this._jumpForce));
+                this._rigidBody2d.velocity = new Vector2(this._rigidBody2d.velocity.x, 15f);
             }
 
-            if (!this._grounded && !jumpHold && this._rigidBody2d.velocity.y > 0)
+            if (!this._grounded && !jumpHold  && !pushHold && this._rigidBody2d.velocity.y > 0)
             {
                 this._rigidBody2d.velocity = new Vector2(this._rigidBody2d.velocity.x,
                     this._rigidBody2d.velocity.y - this._jumpReleaseDecrement);
@@ -169,9 +160,9 @@ namespace UnitySampleAssets._2D
                 this._rigidBody2d.gravityScale = this._baseGravityScale;
             }
 
-            if (push || pull && this._closestMetalSource != null)
+            if (pushHold || pull && this._closestMetalSource != null)
             {
-                this._magnetAction = push
+                this._magnetAction = pushHold
                     ? MagnetAction.Push
                     : MagnetAction.Pull;
             }
@@ -182,12 +173,63 @@ namespace UnitySampleAssets._2D
 
             if (this._magnetAction == MagnetAction.Pull && this._closestMetalSource != null)
             {
-                var effectVector = this._closestMetalSource.position - this.transform.position;
+                var effectVector = this._closestMetalSource.transform.position - this.transform.position;
                 var minSpeed = effectVector.normalized * this._minPullSpeed;
                 var speedVector = Vector2.Distance(Vector2.zero, effectVector) > Vector2.Distance(Vector2.zero, minSpeed)
                     ? effectVector
                     : minSpeed;
                 this._rigidBody2d.velocity = speedVector * this._magnetForce * Time.deltaTime;
+            }
+
+            if (this._magnetAction == MagnetAction.Push && this._closestMetalSource != null)
+            {
+                if (push)
+                {
+                    var box = this._closestMetalSource.bounds;
+                    Vector2 forceDir;
+                    if (this.transform.position.x < box.min.x && this.transform.position.y > box.min.y)
+                    {
+                        forceDir = Vector2.left + Vector2.up;
+                    }
+                    else if (this.transform.position.x >= box.min.x && this.transform.position.x < box.max.x &&
+                             this.transform.position.y > box.min.y)
+                    {
+                        forceDir = Vector2.up;
+                    }
+                    else if (this.transform.position.x >= box.max.x && this.transform.position.y > box.min.y)
+                    {
+                        forceDir = Vector2.right + Vector2.up;
+                    }
+                    else if (this.transform.position.x >= box.max.x && this.transform.position.y <= box.min.y &&
+                             this.transform.position.y > box.max.y)
+                    {
+                        forceDir = Vector2.right;
+                    }
+                    else if (this.transform.position.x >= box.max.x && this.transform.position.y <= box.max.y)
+                    {
+                        forceDir = Vector2.right + Vector2.down;
+                    }
+                    else if (this.transform.position.x >= box.min.x && this.transform.position.x < box.max.x &&
+                             this.transform.position.y <= box.max.y)
+                    {
+                        forceDir = Vector2.down;
+                    }
+                    else if (this.transform.position.x < box.min.x && this.transform.position.y <= box.max.y)
+                    {
+                        forceDir = Vector2.left + Vector2.down;
+                    }
+                    else
+                    {
+                        forceDir = Vector2.right;
+                    }
+
+                    debug.WriteLine($"force: {this._jumpForce}");
+
+                    // Add a force to the player.
+                    this._grounded = false;
+                    this._anim.SetBool("Ground", false);
+                    this._rigidBody2d.velocity = forceDir.normalized * 15f;
+                }
             }
 
             // if ((this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
@@ -217,11 +259,10 @@ namespace UnitySampleAssets._2D
             this._debug.text = debug.ToString();
         }
 
-        private Transform DetectMetal()
+        private Collider2D DetectMetal()
         {
             return Physics2D
                 .OverlapCircleAll(transform.position, magnetismRange, this._whatIsMetal)
-                .Select(x => x.transform)
                 .FirstOrDefault();
         }
 
