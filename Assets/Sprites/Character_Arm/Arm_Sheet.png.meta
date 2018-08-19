@@ -1,9 +1,9 @@
 fileFormatVersion: 2
-guid: b750980626e7c488baa9c8efc7609fda
+guid: 53f780395659c4304bd989562a612990
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Idle_Sheet_0
-    21300002: Idle_Sheet_1
+    21300000: Arm_Sheet_0
+    21300002: Arm_Sheet_1
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -33,7 +33,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 2
+    filterMode: -1
     aniso: -1
     mipBias: -100
     wrapU: 1
@@ -65,7 +65,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -76,7 +76,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 2
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -86,41 +86,41 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Idle_Sheet_0
+      name: Arm_Sheet_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 4
-        width: 300
-        height: 299
+        x: 22
+        y: 131
+        width: 264
+        height: 69
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: edbb3ae479b6b48e8849980af6691437
+      spriteID: a0fe57ef7ad734d3481374c32574a77e
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Idle_Sheet_1
+      name: Arm_Sheet_1
       rect:
         serializedVersion: 2
-        x: 300
-        y: 4
-        width: 300
-        height: 299
+        x: 321
+        y: 127
+        width: 264
+        height: 69
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b46c88fe595e74c83b27006dbdd63401
+      spriteID: c003743aa481f4132975c70d3e2764b3
       vertices: []
       indices: 
       edges: []
@@ -128,7 +128,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 24970767732924a2ba230448b8035171
+    spriteID: 1985488a893e94fd9abff457b4a76798
     vertices: []
     indices: 
     edges: []

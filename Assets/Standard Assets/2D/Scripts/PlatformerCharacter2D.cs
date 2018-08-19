@@ -117,6 +117,7 @@ namespace UnitySampleAssets._2D
         [NotNull] private Transform _floorMetalCheck; // A position marking where to check for underfoot metal
         [NotNull] private Transform _rearMetalCheck; // A position marking where to check for metal behind
         [NotNull] private Transform _frontMetalCheck; // A position marking where to check for metal in front
+        [NotNull] private Transform _arm; // The transform of the arm
         [NotNull] private Animator _anim; // Reference to the player's animator component.
         [NotNull] private Rigidbody2D _rigidBody2D;
         // ReSharper restore NotNullMemberIsNotInitialized
@@ -150,6 +151,7 @@ namespace UnitySampleAssets._2D
             this._floorMetalCheck = this.transform.Find("FloorMetalCheck");
             this._frontMetalCheck = this.transform.Find("FrontMetalCheck");
             this._rearMetalCheck = this.transform.Find("RearMetalCheck");
+            this._arm = this.transform.Find("Arm");
             this._anim = this.GetComponent<Animator>();
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
@@ -186,11 +188,31 @@ namespace UnitySampleAssets._2D
         }
 
 
+        public void SetArmX(float x)
+        {
+            this._arm.localPosition = new Vector2(x, this._arm.localPosition.y);
+        }
+
+
+        public void SetArmY(float y)
+        {
+            this._arm.localPosition = new Vector2(this._arm.localPosition.x, y);
+        }
+
+
         /*
          * Public interface
          */
 
-        public void Move(float move, bool crouch, bool jump, bool jumpHold, bool push, bool pushHold, bool pull)
+        public void Move(
+            float horizontal,
+            float vertical,
+            bool crouch,
+            bool jump,
+            bool jumpHold,
+            bool push,
+            bool pushHold,
+            bool pull)
         {
             var debug = new StringWriter();
             var forces = new List<Vector2>();
@@ -201,7 +223,7 @@ namespace UnitySampleAssets._2D
                     this._magnetRange,
                     this._whatIsMetal);
 
-            var targetVelocity = this._maxSpeed * move;
+            var targetVelocity = this._maxSpeed * horizontal;
 
             Debug.DrawRay(this.transform.position, Vector2.left * this._magnetRange, Color.red);
             Debug.DrawRay(this.transform.position, Vector2.right * this._magnetRange, Color.red);
@@ -226,10 +248,7 @@ namespace UnitySampleAssets._2D
             if ((this._grounded || this._airControl) && this._magnetAction != MagnetAction.Pull)
             {
                 // Reduce the speed if crouching by the crouchSpeed multiplier
-                move = (crouch ? move * this._crouchSpeed : move);
-
-                // The Speed animator parameter is set to the absolute value of the horizontal input.
-                this._anim.SetFloat("Speed", Mathf.Abs(move));
+                horizontal = (crouch ? horizontal * this._crouchSpeed : horizontal);
 
                 var baseAcceleration = Vector2.right * (targetVelocity - this._rigidBody2D.velocity.x);
                 var acceleration = Math.Sign(baseAcceleration.x) != Math.Sign(this._rigidBody2D.velocity.x)
@@ -241,8 +260,8 @@ namespace UnitySampleAssets._2D
                 //this._rigidBody2D.velocity = new Vector2(move * this._maxSpeed, this._rigidBody2D.velocity.y);
 
                 // If the input is moving the player right and the player is facing left...
-                if (move > 0 && !this._facingRight
-                    || move < 0 && this._facingRight)
+                if (horizontal > 0 && !this._facingRight
+                    || horizontal < 0 && this._facingRight)
 
                     // ... flip the player.
                 {
@@ -310,27 +329,30 @@ namespace UnitySampleAssets._2D
                     }
                     break;
 
-                //case MagnetAction.Push when this._activeMetal != null && push:
-                //    this._rigidBody2D.velocity =
-                //        PlatformerCharacter2D.GetInitialPushVelocity(
-                //            this._activeMetal,
-                //            this.transform.position,
-                //            this._magnetForce);
-                //    this._grounded = false;
-                //    this._anim.SetBool("Ground", false);
-
-                //    break;
-
-                //case MagnetAction.Push when this._activeMetal != null:
-                //    var continuousPushForce = PlatformerCharacter2D.GetContinuousPushForce(
-                //        this._activeMetal,
-                //        this.transform.position,
-                //        this._magnetForce);
-                //    Debug.DrawRay(this.transform.position, continuousPushForce, Color.green);
-                //    this._rigidBody2D.AddForce(
-                //        continuousPushForce);
-                //    break;
+                case MagnetAction.Push:
+                    forces.Add(
+                        PlatformerCharacter2D.GetInitialPushForce(
+                            this._activeMetal,
+                            this.transform.position,
+                            this._magnetForce));
+                    this._grounded = false;
+                    this._anim.SetBool("Ground", false);
+                    break;
             }
+
+            var armPos = this._arm.position;
+            var sign = this._facingRight ? 1 : -1;
+
+            var armTarget =
+                (this._activeMetal != null
+                    ? (Vector2) (this._activeMetal.transform.position - armPos)
+                    : math.abs(vertical) < float.Epsilon
+                        ? Vector2.right * sign
+                        : new Vector2(horizontal, vertical))
+                .normalized;
+
+            var armAngle = math.atan2(1f * sign, 0f) - math.atan2(armTarget.x, armTarget.y);
+            this._arm.transform.rotation = Quaternion.Euler(Vector3.forward * math.degrees(armAngle));
 
             var force = forces.Aggregate(Vector2.zero, (x, y) => x + y);
             var effectiveForce = force + (Vector2)Physics.gravity;
@@ -340,6 +362,8 @@ namespace UnitySampleAssets._2D
             debug.WriteLine($"IsMetalAbove: {this._isMetalAbove.ToString()}");
             Debug.DrawRay(this.transform.position, effectiveForce, Color.green);
 
+            // The Speed animator parameter is set to the absolute value of the horizontal input.
+            this._anim.SetFloat("Speed", Mathf.Abs(this._rigidBody2D.velocity.x));
             this._rigidBody2D.AddForce(force);
             this._debug.text = debug.ToString();
         }
@@ -361,13 +385,13 @@ namespace UnitySampleAssets._2D
             Vector3 playerPosition,
             float force)
         {
-            var direction = GetInitialPushVelocity(metalSource, playerPosition, force).normalized;
+            var direction = PlatformerCharacter2D.GetInitialPushForce(metalSource, playerPosition, force).normalized;
             var distance = math.abs(Vector2.Distance(playerPosition, metalSource.transform.position));
             var effectiveForce = 1f / math.sqrt(distance) * force;
             return direction * effectiveForce * 0.01f;
         }
 
-        private static Vector2 GetInitialPushVelocity(
+        private static Vector2 GetInitialPushForce(
             [NotNull] Collider2D metalSource,
             Vector2 playerPosition,
             float force)
@@ -377,7 +401,7 @@ namespace UnitySampleAssets._2D
                 playerPosition.x < box.min.x ? -1f : (playerPosition.x >= box.max.x ? 1f : 0f),
                 playerPosition.y > box.min.y ? 1f : (playerPosition.y <= box.max.y ? -1f : 0f));
 
-            return forceDir.normalized * force * Time.deltaTime;
+            return forceDir.normalized * force;
         }
 
         private static Vector2 GetPullForce(

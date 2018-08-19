@@ -1,15 +1,13 @@
 fileFormatVersion: 2
-guid: d2ee5f0ed4fd54792a4cc020e70e0c2e
+guid: 4a75c687132e54581a31ae80decf6ad3
 TextureImporter:
   fileIDToRecycleName:
-    21300000: Walk_0
-    21300002: Walk_1
-    21300004: Walk_2
-    21300006: Walk_3
-    21300008: Walk_4
-    21300010: Walk_5
-    21300012: Walk_6
-    21300014: Walk_7
+    21300000: Jump_Sheet_0
+    21300002: Jump_Sheet_1
+    21300004: Jump_Sheet_2
+    21300006: Jump_Sheet_3
+    21300008: Jump_Sheet_4
+    21300010: Jump_Sheet_5
   externalObjects: {}
   serializedVersion: 7
   mipmaps:
@@ -92,11 +90,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Walk_0
+      name: Jump_Sheet_0
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 3
         width: 300
         height: 300
       alignment: 0
@@ -106,17 +104,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 87fca875783c64ad49ac5dcf4301ed09
+      spriteID: f90254e9c116b4869aa9c9914d8fe153
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk_1
+      name: Jump_Sheet_1
       rect:
         serializedVersion: 2
         x: 300
-        y: 0
+        y: 3
         width: 300
         height: 300
       alignment: 0
@@ -126,17 +124,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6f82d4405bf9c44448f58c869be81a18
+      spriteID: 7c3ee4a63324d4633b8145a67e0b5b46
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk_2
+      name: Jump_Sheet_2
       rect:
         serializedVersion: 2
         x: 600
-        y: 0
+        y: 3
         width: 300
         height: 300
       alignment: 0
@@ -146,17 +144,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7275644c76d0f4c819a90abc550d3fb8
+      spriteID: 59720b1a01b614462a5650ec95c95cc1
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk_3
+      name: Jump_Sheet_3
       rect:
         serializedVersion: 2
         x: 900
-        y: 0
+        y: 3
         width: 300
         height: 300
       alignment: 0
@@ -166,17 +164,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1630e62d4aea04bab920b92f52d93894
+      spriteID: 9eff36b57adff415a93630d821ce1005
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk_4
+      name: Jump_Sheet_4
       rect:
         serializedVersion: 2
         x: 1200
-        y: 0
+        y: 3
         width: 300
         height: 300
       alignment: 0
@@ -186,17 +184,17 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 07f3bb523208846b89e849aafae0b72c
+      spriteID: 57e43b3d4d6dd4c0d8f7320fc83f1fec
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Walk_5
+      name: Jump_Sheet_5
       rect:
         serializedVersion: 2
         x: 1500
-        y: 0
+        y: 3
         width: 300
         height: 300
       alignment: 0
@@ -206,47 +204,7 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ce390701077c04272ade7beee5780fae
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Walk_6
-      rect:
-        serializedVersion: 2
-        x: 1800
-        y: 0
-        width: 300
-        height: 300
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d4cdd7005a70e4870a182e059de78810
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Walk_7
-      rect:
-        serializedVersion: 2
-        x: 2100
-        y: 0
-        width: 300
-        height: 300
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c297b3f2b8eee41c0bfcc015d5fa2691
+      spriteID: 326a57df8dd404dc3acb5f416ce814be
       vertices: []
       indices: 
       edges: []
@@ -254,7 +212,7 @@ TextureImporter:
     outline: []
     physicsShape: []
     bones: []
-    spriteID: 120adaeb5797b41d69ec32c91597ec00
+    spriteID: 2ef072b25eac442388f94af1f3f6bb45
     vertices: []
     indices: 
     edges: []
