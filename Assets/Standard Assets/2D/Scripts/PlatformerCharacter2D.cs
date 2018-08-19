@@ -19,12 +19,12 @@ namespace UnitySampleAssets._2D
         private float _magnetForce = 400f; // Amount of force added when the player engages the magnet.
 
         [FormerlySerializedAs("jumpReleaseDamping")] [SerializeField]
-        private float _jumpReleaseDamping = 400f; // Amount of force added when the player jumps.
+        private float _jumpReleaseDecrement = 1f; // Amount of force added when the player jumps.
 
         [FormerlySerializedAs("fallMultiplier")] [SerializeField]
         private float _fallMultiplier = 1f; // Amount of force added when the player jumps.
 
-        [SerializeField] private float _pulseMultiplier = 1f; // Amount of force added when the player jumps.
+        [SerializeField] private float _pulseForce = 400f; // Amount of force added when the player jumps.
 
         [SerializeField] private int magnetismRange = 5;
         [SerializeField] private float magnetismSpeed = 1.0f;
@@ -147,7 +147,7 @@ namespace UnitySampleAssets._2D
             if (!this._grounded && !jumpHold && this._rigidBody2d.velocity.y > 0)
             {
                 this._rigidBody2d.velocity = new Vector2(this._rigidBody2d.velocity.x,
-                    this._rigidBody2d.velocity.y / this._jumpReleaseDamping);
+                    this._rigidBody2d.velocity.y - this._jumpReleaseDecrement);
             }
 
             if (this._rigidBody2d.velocity.y <= 0f)
@@ -174,30 +174,29 @@ namespace UnitySampleAssets._2D
 
             if (this._magnetAction == MagnetAction.Push || this._magnetAction == MagnetAction.Pull)
             {
-                var force = jumpHold
-                    ? this._magnetForce * this._pulseMultiplier
-                    : this._magnetForce;
-                var range = jumpHold
-                    ? this.magnetismRange * this._pulseMultiplier
-                    : this.magnetismRange;
+                var force = this._magnetForce;
+                var range = this.magnetismRange;
 
-                var affectVector = (this._affectedMetal.position - this.transform.position).normalized;
+                var effectVector = (this._affectedMetal.position - this.transform.position).normalized;
 
-                Debug.DrawRay(this.transform.position, affectVector, Color.cyan);
+                Debug.DrawRay(this.transform.position, effectVector, Color.cyan);
 
-                if (this._magnetAction == MagnetAction.Push)
-                {
-                    this._rigidBody2d.AddForce(
-                        affectVector
-                        * -math.max(
+                var effectDir = this._magnetAction == MagnetAction.Push ? -1 : 1;
+                this._rigidBody2d.AddForce(
+                    effectVector
+                    * effectDir
+                    * math.max(
+                        0f,
+                        math.lerp(
+                            force,
                             0f,
-                            math.lerp(
-                                force,
-                                0f,
-                                Vector2.Distance(
-                                    this.transform.position,
-                                    this._affectedMetal.position)
-                                / range)));
+                            Vector2.Distance(
+                                this.transform.position,
+                                this._affectedMetal.position)
+                            / range)));
+                if (jump)
+                {
+                    this._rigidBody2d.AddForce(effectVector * this._pulseForce * effectDir);
                 }
             }
         }
