@@ -245,6 +245,7 @@ namespace UnitySampleAssets._2D
             this._camera.transform.position = this._initialPos;
             this.transform.localScale = this._initialScale;
             this._rigidBody2D.velocity = Vector2.zero;
+            this._facingRight = true;
         }
 
 
@@ -458,6 +459,7 @@ namespace UnitySampleAssets._2D
         {
             return Physics2D
                 .OverlapCircleAll(playerPosition, magnetRange, whatIsMetal)
+                .OrderBy(x => math.abs(Vector2.Distance(x.transform.position, playerPosition)))
                 .FirstOrDefault();
         }
 
