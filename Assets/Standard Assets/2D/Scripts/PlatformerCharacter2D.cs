@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Media;
 using JetBrains.Annotations;
 using Unity.Mathematics;
 using UnityEngine;
@@ -106,6 +107,8 @@ namespace UnitySampleAssets._2D
         /// </summary>
         [SerializeField] private LayerMask _whatIsMetal;
 
+        public AudioClip JumpSound;
+
 
         /*
          * Constants
@@ -132,6 +135,7 @@ namespace UnitySampleAssets._2D
         // ReSharper restore NotNullMemberIsNotInitialized
         private float _baseGravityScale;
         [NotNull] private Beam _beam;
+        [NotNull] private AudioSource _source;
 
 
         /*
@@ -166,6 +170,7 @@ namespace UnitySampleAssets._2D
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
             this._beam = this.GetComponentInChildren<Beam>();
+            this._source = this.GetComponent<AudioSource>();
         }
 
 
@@ -297,6 +302,7 @@ namespace UnitySampleAssets._2D
                 this._grounded = false;
                 this._anim.SetBool("Ground", false);
                 forces.Add(Vector2.up * this._jumpForce);
+                this._source.PlayOneShot(this.JumpSound, 2f);
             }
 
             if (!this._grounded && !jumpHold && !pushHold && this._rigidBody2D.velocity.y > 0)
