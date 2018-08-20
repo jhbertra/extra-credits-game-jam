@@ -424,9 +424,11 @@ namespace UnitySampleAssets._2D
             var armTarget =
                 (this._activeMetal != null
                     ? (Vector2) (this._activeMetal.transform.position - armPos)
-                    : math.abs(vertical) < float.Epsilon
-                        ? Vector2.right * sign
-                        : new Vector2(horizontal, vertical))
+                    : this._closestMetalSource != null
+                        ? (Vector2) (this._closestMetalSource.transform.position - armPos)
+                        : math.abs(vertical) < float.Epsilon
+                            ? Vector2.right * sign
+                            : new Vector2(horizontal, vertical))
                 .normalized;
 
             var armAngle = math.atan2(1f * sign, 0f) - math.atan2(armTarget.x, armTarget.y);
