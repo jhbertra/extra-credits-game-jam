@@ -108,6 +108,10 @@ namespace UnitySampleAssets._2D
         [SerializeField] private LayerMask _whatIsMetal;
 
         public AudioClip JumpSound;
+        public AudioClip PushSound;
+        public AudioClip BuzzStartSound;
+        public AudioClip BuzzSound;
+        public AudioClip BuzzEndSound;
 
 
         /*
@@ -136,6 +140,7 @@ namespace UnitySampleAssets._2D
         private float _baseGravityScale;
         [NotNull] private Beam _beam;
         [NotNull] private AudioSource _source;
+        [NotNull] private AudioSource _buzzSource;
 
 
         /*
@@ -170,7 +175,9 @@ namespace UnitySampleAssets._2D
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
             this._beam = this.GetComponentInChildren<Beam>();
-            this._source = this.GetComponent<AudioSource>();
+            var sources = this.GetComponents<AudioSource>();
+            this._source = sources[0];
+            this._buzzSource = sources[1];
         }
 
 
@@ -322,6 +329,12 @@ namespace UnitySampleAssets._2D
                         ? MagnetAction.Push
                         : MagnetAction.Pull;
                     this._activeMetal = this._closestMetalSource;
+
+                    if (this._magnetAction == MagnetAction.Pull)
+                    {
+                        this._source.PlayOneShot(this.BuzzStartSound, 2f);
+                        this._buzzSource.volume = 1f;
+                    }
                 }
 
                 if (this._isMetalAbove || this._isMetalInFront || this._isMetalBehind)
@@ -339,6 +352,11 @@ namespace UnitySampleAssets._2D
             }
             else
             {
+                if (this._magnetAction == MagnetAction.Pull)
+                {
+                    this._source.PlayOneShot(this.BuzzEndSound, 2f);
+                    this._buzzSource.volume = 0f;
+                }
                 this._magnetAction = MagnetAction.Nothing;
                 this._activeMetal = null;
                 this._beam.Erase();
@@ -374,6 +392,7 @@ namespace UnitySampleAssets._2D
                             this._magnetForce,
                             this._pulseMultiplier,
                             this._rigidBody2D.velocity));
+                    this._source.PlayOneShot(this.PushSound, 2f);
                     break;
             }
 
