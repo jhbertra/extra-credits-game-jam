@@ -328,11 +328,8 @@ namespace UnitySampleAssets._2D
                         : MagnetAction.Pull;
                     this._activeMetal = this._closestMetalSource;
 
-                    if (this._magnetAction == MagnetAction.Pull)
-                    {
-                        this._source.PlayOneShot(this.BuzzStartSound, 2f);
-                        this._buzzSource.volume = 1f;
-                    }
+                    this._source.PlayOneShot(this.BuzzStartSound, 2f);
+                    this._buzzSource.volume = 1f;
                 }
 
                 if (this._isMetalAbove || this._isMetalInFront || this._isMetalBehind)
@@ -350,7 +347,7 @@ namespace UnitySampleAssets._2D
             }
             else
             {
-                if (this._magnetAction == MagnetAction.Pull)
+                if (this._magnetAction != MagnetAction.Nothing)
                 {
                     this._source.PlayOneShot(this.BuzzEndSound, 2f);
                     this._buzzSource.volume = 0f;
