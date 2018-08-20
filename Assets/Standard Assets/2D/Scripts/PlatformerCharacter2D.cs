@@ -131,6 +131,7 @@ namespace UnitySampleAssets._2D
         [NotNull] private Rigidbody2D _rigidBody2D;
         // ReSharper restore NotNullMemberIsNotInitialized
         private float _baseGravityScale;
+        [NotNull] private Beam _beam;
 
 
         /*
@@ -164,6 +165,7 @@ namespace UnitySampleAssets._2D
             this._anim = this.GetComponent<Animator>();
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
+            this._beam = this.GetComponentInChildren<Beam>();
         }
 
 
@@ -315,11 +317,25 @@ namespace UnitySampleAssets._2D
                         : MagnetAction.Pull;
                     this._activeMetal = this._closestMetalSource;
                 }
+
+                if (this._isMetalAbove || this._isMetalInFront || this._isMetalBehind)
+                {
+                    this._beam.Erase();
+                }
+                else if (this._activeMetal == null)
+                {
+                    this._beam.Draw(this._magnetRange);
+                }
+                else
+                {
+                    this._beam.Draw(Vector2.Distance(this._beam.transform.position, this._activeMetal.transform.position));
+                }
             }
             else
             {
                 this._magnetAction = MagnetAction.Nothing;
                 this._activeMetal = null;
+                this._beam.Erase();
             }
 
             switch (this._magnetAction)
