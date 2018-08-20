@@ -350,12 +350,8 @@ namespace UnitySampleAssets._2D
                             this._activeMetal,
                             this.transform.position,
                             this._magnetForce,
-                            this._pulseMultiplier));
-                    break;
-
-                case MagnetAction.Push:
-                    forces.AddRange(
-                        this.DoContinuousPushForce(this._activeMetal));
+                            this._pulseMultiplier,
+                            this._rigidBody2D.velocity));
                     break;
             }
 
@@ -406,25 +402,22 @@ namespace UnitySampleAssets._2D
             return effectVector * force;
         }
 
-        private IEnumerable<Vector2> DoContinuousPushForce([NotNull] Collider2D metalSource)
-        {
-            var distance = math.abs(Vector2.Distance(this.transform.position, metalSource.transform.position));
-            if (distance < this._magnetRange * 2)
-            {
-                yield return -Physics2D.gravity * this._rigidBody2D.gravityScale;
-            }
-        }
-
         private static Vector2 GetInitialPushForce(
             [NotNull] Collider2D metalSource,
             Vector2 playerPosition,
             float force,
-            float pulseMultiplier)
+            float pulseMultiplier,
+            Vector2 velocity)
         {
             var box = metalSource.bounds;
-            var forceDir = PlatformerCharacter2D.GetForceDir(playerPosition, box);
+            var forceDir = PlatformerCharacter2D.GetForceDir(playerPosition, box).normalized;
+            velocity = velocity.normalized;
 
-            return forceDir.normalized * force * pulseMultiplier;
+            if (Vector2.Dot(forceDir, velocity) < 0f)
+            {
+                force *= 2;
+            }
+            return forceDir * force * pulseMultiplier;
         }
 
         private static Vector2 GetForceDir(Vector2 playerPosition, Bounds box)
