@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace UnitySampleAssets._2D
@@ -11,6 +12,7 @@ namespace UnitySampleAssets._2D
         public float lookAheadFactor = 3;
         public float lookAheadReturnSpeed = 0.5f;
         public float lookAheadMoveThreshold = 0.1f;
+        public float MinX;
 
         private float offsetZ;
         private Vector3 lastTargetPosition;
@@ -49,6 +51,7 @@ namespace UnitySampleAssets._2D
             transform.position = newPos;
 
             lastTargetPosition = target.position;
+            this.transform.position = new Vector3(math.max(this.MinX, newPos.x), newPos.y, newPos.z);
         }
     }
 }

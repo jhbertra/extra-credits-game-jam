@@ -73,10 +73,8 @@ namespace UnitySampleAssets._2D
         [SerializeField]
         private float _pulseMultiplier;
 
-        /// <summary>
-        /// The Minimum speed to travel when pulling
-        /// </summary>
-        [SerializeField] private float _minPullSpeed;
+
+        public float MinX;
 
         /// <summary>
         /// The range of the magnetic effect
@@ -415,6 +413,11 @@ namespace UnitySampleAssets._2D
             debug.WriteLine($"ActiveMetal: {this._activeMetal?.GetInstanceID()}");
             debug.WriteLine($"Push: {push}");
             Debug.DrawRay(this.transform.position, effectiveForce, Color.green);
+
+            this.transform.position = new Vector3(
+                math.max(this.MinX, this.transform.position.x),
+                this.transform.position.y,
+                this.transform.position.z);
 
             // The Speed animator parameter is set to the absolute value of the horizontal input.
             this._anim.SetFloat("Speed", Mathf.Abs(this._rigidBody2D.velocity.x));
