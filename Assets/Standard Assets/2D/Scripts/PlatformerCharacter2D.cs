@@ -72,7 +72,7 @@ namespace UnitySampleAssets._2D
         /// The range of the magnetic effect
         /// </summary>
         [FormerlySerializedAs("magnetismRange")] [SerializeField]
-        private int _magnetRange = 5;
+        private int _magnetRange = 10;
 
         /// <summary>
         /// Amount of maxSpeed applied to crouching movement. 1 = 100%
