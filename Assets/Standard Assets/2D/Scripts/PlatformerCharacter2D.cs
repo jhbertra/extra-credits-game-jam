@@ -355,6 +355,10 @@ namespace UnitySampleAssets._2D
                         ? MagnetAction.Push
                         : MagnetAction.Pull;
                     this._activeMetal = this._closestMetalSource;
+                    this._activeMetal.gameObject.GetComponent<SpriteRenderer>().color =
+                        this._magnetAction == MagnetAction.Push
+                            ? Color.blue
+                            : Color.red;
 
                     this._source.PlayOneShot(this.BuzzStartSound, 2f);
                     this._buzzSource.volume = 1f;
@@ -380,9 +384,14 @@ namespace UnitySampleAssets._2D
                     this._source.PlayOneShot(this.BuzzEndSound, 2f);
                     this._buzzSource.volume = 0f;
                 }
+
+                if (this._activeMetal != null)
+                {
+                    this._activeMetal.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+                }
                 this._magnetAction = MagnetAction.Nothing;
                 this._activeMetal = null;
-                this._beam.Erase();
+                //this._beam.Erase();
             }
 
             switch (this._magnetAction)
