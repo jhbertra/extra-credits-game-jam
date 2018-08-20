@@ -53,14 +53,6 @@ BlendTree:
   m_Name: Jumps
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: 7400000, guid: 09c96cfd250554535accf3e33cf6c4f8, type: 2}
-    m_Threshold: -10.828911
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: 
-    m_Mirror: 0
-  - serializedVersion: 2
     m_Motion: {fileID: 7400000, guid: 1dab131599ac84171aac52bc600d033b, type: 2}
     m_Threshold: -6.2721863
     m_Position: {x: 0, y: 0}
@@ -94,7 +86,7 @@ BlendTree:
     m_Mirror: 0
   m_BlendParameter: vSpeed
   m_BlendParameterY: Speed
-  m_MinThreshold: -10.828911
+  m_MinThreshold: -6.2721863
   m_MaxThreshold: 2.1620672
   m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0

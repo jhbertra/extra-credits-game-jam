@@ -206,7 +206,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4215648387860966, guid: 839431bc93df24512ad33ded8594ce78, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.85
+      value: 2.91
       objectReference: {fileID: 0}
     - target: {fileID: 4215648387860966, guid: 839431bc93df24512ad33ded8594ce78, type: 2}
       propertyPath: m_LocalPosition.z
@@ -245,7 +245,7 @@ Prefab:
     - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
         type: 2}
       propertyPath: _pulseMultiplier
-      value: 2
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
         type: 2}
@@ -358,6 +358,21 @@ Prefab:
         type: 2}
       propertyPath: m_SortingOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
+        type: 2}
+      propertyPath: _negativeAirAcceleration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
+        type: 2}
+      propertyPath: _airAcceleration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114473476883421696, guid: 839431bc93df24512ad33ded8594ce78,
+        type: 2}
+      propertyPath: _pushAcceleration
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 839431bc93df24512ad33ded8594ce78, type: 2}
@@ -585,7 +600,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1089349501}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.131, y: 0.158, z: 0}
+  m_LocalPosition: {x: 0.11, y: 0.44, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1953184996}
