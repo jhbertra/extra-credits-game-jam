@@ -138,7 +138,7 @@ namespace UnitySampleAssets._2D
         [NotNull] private Rigidbody2D _rigidBody2D;
         // ReSharper restore NotNullMemberIsNotInitialized
         private float _baseGravityScale;
-        [NotNull] private Beam _beam;
+        //[NotNull] private Beam _beam;
         [NotNull] private AudioSource _source;
         [NotNull] private AudioSource _buzzSource;
         private Vector2 _initialPos;
@@ -177,7 +177,7 @@ namespace UnitySampleAssets._2D
             this._anim = this.GetComponent<Animator>();
             this._rigidBody2D = this.GetComponent<Rigidbody2D>();
             this._baseGravityScale = this._rigidBody2D.gravityScale;
-            this._beam = this.GetComponentInChildren<Beam>();
+            //this._beam = this.GetComponentInChildren<Beam>();
             var sources = this.GetComponents<AudioSource>();
             this._source = sources[0];
             this._buzzSource = sources[1];
@@ -360,18 +360,18 @@ namespace UnitySampleAssets._2D
                     this._buzzSource.volume = 1f;
                 }
 
-                if (this._isMetalAbove || this._isMetalInFront || this._isMetalBehind)
-                {
-                    this._beam.Erase();
-                }
-                else if (this._activeMetal == null)
-                {
-                    this._beam.Draw(this._magnetRange);
-                }
-                else
-                {
-                    this._beam.Draw(Vector2.Distance(this._beam.transform.position, this._activeMetal.transform.position));
-                }
+                // if (this._isMetalAbove || this._isMetalInFront || this._isMetalBehind)
+                // {
+                //     this._beam.Erase();
+                // }
+                // else if (this._activeMetal == null)
+                // {
+                //     this._beam.Draw(this._magnetRange);
+                // }
+                // else
+                // {
+                //     this._beam.Draw(Vector2.Distance(this._beam.transform.position, this._activeMetal.transform.position));
+                // }
             }
             else
             {
