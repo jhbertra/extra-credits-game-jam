@@ -40,6 +40,12 @@ namespace UnitySampleAssets._2D
         private float _negativeAcceleration = 10f;
 
         /// <summary>
+        /// The rate of positive change of horizonal speed in air
+        /// </summary>
+        [SerializeField]
+        private float _pushAcceleration = 10f;
+
+        /// <summary>
         /// The force applied when jumping
         /// </summary>
         [FormerlySerializedAs("jumpForce")] [SerializeField]
@@ -62,6 +68,9 @@ namespace UnitySampleAssets._2D
         /// </summary>
         [FormerlySerializedAs("fallMultiplier")] [SerializeField]
         private float _fallMultiplier = 1f;
+
+        [SerializeField]
+        private float _pulseMultiplier;
 
         /// <summary>
         /// The Minimum speed to travel when pulling
@@ -224,6 +233,7 @@ namespace UnitySampleAssets._2D
                     this._whatIsMetal);
 
             var targetVelocity = this._maxSpeed * horizontal;
+            var sign = this._facingRight ? 1 : -1;
 
             Debug.DrawRay(this.transform.position, Vector2.left * this._magnetRange, Color.red);
             Debug.DrawRay(this.transform.position, Vector2.right * this._magnetRange, Color.red);
@@ -251,9 +261,11 @@ namespace UnitySampleAssets._2D
                 horizontal = (crouch ? horizontal * this._crouchSpeed : horizontal);
 
                 var baseAcceleration = Vector2.right * (targetVelocity - this._rigidBody2D.velocity.x);
-                var acceleration = Math.Sign(baseAcceleration.x) != Math.Sign(this._rigidBody2D.velocity.x)
+                var acceleration = Math.Sign(baseAcceleration.x) == sign
                     ? this._negativeAcceleration
-                    : this._positiveAcceleration;
+                    : pushHold
+                        ? this._pushAcceleration
+                        : this._positiveAcceleration;
                 forces.Add(baseAcceleration * acceleration);
 
                 // Move the character
@@ -329,19 +341,25 @@ namespace UnitySampleAssets._2D
                     }
                     break;
 
-                case MagnetAction.Push:
+                case MagnetAction.Push when push:
+                    // Add a vertical force to the player.
+                    this._grounded = false;
+                    this._anim.SetBool("Ground", false);
                     forces.Add(
                         PlatformerCharacter2D.GetInitialPushForce(
                             this._activeMetal,
                             this.transform.position,
-                            this._magnetForce));
-                    this._grounded = false;
-                    this._anim.SetBool("Ground", false);
+                            this._magnetForce,
+                            this._pulseMultiplier));
+                    break;
+
+                case MagnetAction.Push:
+                    forces.AddRange(
+                        this.DoContinuousPushForce(this._activeMetal));
                     break;
             }
 
             var armPos = this._arm.position;
-            var sign = this._facingRight ? 1 : -1;
 
             var armTarget =
                 (this._activeMetal != null
@@ -356,10 +374,9 @@ namespace UnitySampleAssets._2D
 
             var force = forces.Aggregate(Vector2.zero, (x, y) => x + y);
             var effectiveForce = force + (Vector2)Physics.gravity;
+
             debug.WriteLine($"ActiveMetal: {this._activeMetal?.GetInstanceID()}");
-            debug.WriteLine($"IsMetalUnderfoot: {this._isMetalUnderfoot.ToString()}");
-            debug.WriteLine($"IsMetalInFront: {this._isMetalInFront.ToString()}");
-            debug.WriteLine($"IsMetalAbove: {this._isMetalAbove.ToString()}");
+            debug.WriteLine($"Push: {push}");
             Debug.DrawRay(this.transform.position, effectiveForce, Color.green);
 
             // The Speed animator parameter is set to the absolute value of the horizontal input.
@@ -380,30 +397,6 @@ namespace UnitySampleAssets._2D
                 .FirstOrDefault();
         }
 
-        private static Vector2 GetContinuousPushForce(
-            [NotNull] Collider2D metalSource,
-            Vector3 playerPosition,
-            float force)
-        {
-            var direction = PlatformerCharacter2D.GetInitialPushForce(metalSource, playerPosition, force).normalized;
-            var distance = math.abs(Vector2.Distance(playerPosition, metalSource.transform.position));
-            var effectiveForce = 1f / math.sqrt(distance) * force;
-            return direction * effectiveForce * 0.01f;
-        }
-
-        private static Vector2 GetInitialPushForce(
-            [NotNull] Collider2D metalSource,
-            Vector2 playerPosition,
-            float force)
-        {
-            var box = metalSource.bounds;
-            var forceDir = new Vector2(
-                playerPosition.x < box.min.x ? -1f : (playerPosition.x >= box.max.x ? 1f : 0f),
-                playerPosition.y > box.min.y ? 1f : (playerPosition.y <= box.max.y ? -1f : 0f));
-
-            return forceDir.normalized * force;
-        }
-
         private static Vector2 GetPullForce(
             Vector2 metalSourcePosition,
             Vector2 playerPosition,
@@ -411,6 +404,35 @@ namespace UnitySampleAssets._2D
         {
             var effectVector = (metalSourcePosition - playerPosition).normalized;
             return effectVector * force;
+        }
+
+        private IEnumerable<Vector2> DoContinuousPushForce([NotNull] Collider2D metalSource)
+        {
+            var distance = math.abs(Vector2.Distance(this.transform.position, metalSource.transform.position));
+            if (distance < this._magnetRange * 2)
+            {
+                yield return -Physics2D.gravity * this._rigidBody2D.gravityScale;
+            }
+        }
+
+        private static Vector2 GetInitialPushForce(
+            [NotNull] Collider2D metalSource,
+            Vector2 playerPosition,
+            float force,
+            float pulseMultiplier)
+        {
+            var box = metalSource.bounds;
+            var forceDir = PlatformerCharacter2D.GetForceDir(playerPosition, box);
+
+            return forceDir.normalized * force * pulseMultiplier;
+        }
+
+        private static Vector2 GetForceDir(Vector2 playerPosition, Bounds box)
+        {
+            var forceDir = new Vector2(
+                playerPosition.x < box.min.x ? -1f : (playerPosition.x >= box.max.x ? 1f : 0f),
+                playerPosition.y > box.min.y ? 1f : (playerPosition.y <= box.max.y ? -1f : 0f));
+            return forceDir;
         }
 
 
