@@ -99,6 +99,8 @@ namespace UnitySampleAssets._2D
         /// </summary>
         [FormerlySerializedAs("whatIsGround")] [SerializeField]
         private LayerMask _whatIsGround;
+        [SerializeField]
+        private LayerMask _whatIsDeath;
 
         /// <summary>
         /// A mask determining what is metal to the character
@@ -139,6 +141,8 @@ namespace UnitySampleAssets._2D
         [NotNull] private Beam _beam;
         [NotNull] private AudioSource _source;
         [NotNull] private AudioSource _buzzSource;
+        private Vector2 _initialPos;
+        private Vector2 _initialScale;
 
 
         /*
@@ -154,6 +158,7 @@ namespace UnitySampleAssets._2D
         [CanBeNull] private Collider2D _closestMetalSource;
         [CanBeNull] private Collider2D _activeMetal;
         private MagnetAction _magnetAction;
+        private Camera _camera;
 
 
         /*
@@ -176,6 +181,9 @@ namespace UnitySampleAssets._2D
             var sources = this.GetComponents<AudioSource>();
             this._source = sources[0];
             this._buzzSource = sources[1];
+            this._initialPos = this.transform.position;
+            this._initialScale = this.transform.localScale;
+            this._camera = Camera.main;
         }
 
 
@@ -208,6 +216,17 @@ namespace UnitySampleAssets._2D
             this._anim.SetFloat("vSpeed", this._rigidBody2D.velocity.y);
         }
 
+        private void Update()
+        {
+            if (Physics2D.OverlapCircle(
+                this._groundCheck.position,
+                PlatformerCharacter2D.GroundedRadius,
+                this._whatIsDeath))
+            {
+                this.Die();
+            }
+        }
+
 
         public void SetArmX(float x)
         {
@@ -218,6 +237,14 @@ namespace UnitySampleAssets._2D
         public void SetArmY(float y)
         {
             this._arm.localPosition = new Vector2(this._arm.localPosition.x, y);
+        }
+
+        private void Die()
+        {
+            this.transform.position = this._initialPos;
+            this._camera.transform.position = this._initialPos;
+            this.transform.localScale = this._initialScale;
+            this._rigidBody2D.velocity = Vector2.zero;
         }
 
 
