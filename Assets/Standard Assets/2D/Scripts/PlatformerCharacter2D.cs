@@ -6,6 +6,7 @@ using System.Media;
 using JetBrains.Annotations;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -101,6 +102,11 @@ namespace UnitySampleAssets._2D
         private LayerMask _whatIsGround;
         [SerializeField]
         private LayerMask _whatIsDeath;
+        [SerializeField]
+        private LayerMask _whatIsWin;
+
+        [SerializeField]
+        private Text _winText;
 
         /// <summary>
         /// A mask determining what is metal to the character
@@ -155,6 +161,7 @@ namespace UnitySampleAssets._2D
         private bool _isMetalInFront;
         private bool _isMetalBehind;
         private bool _isMetalAbove;
+        private bool _isWin;
         [CanBeNull] private Collider2D _closestMetalSource;
         [CanBeNull] private Collider2D _activeMetal;
         private MagnetAction _magnetAction;
@@ -210,6 +217,24 @@ namespace UnitySampleAssets._2D
                 this._ceilingCheck.position,
                 PlatformerCharacter2D.MetalRadius,
                 this._whatIsMetal);
+
+            this._isWin = Physics2D.OverlapCircle(
+                this._floorMetalCheck.position,
+                PlatformerCharacter2D.MetalRadius,
+                this._whatIsWin)
+                || Physics2D.OverlapCircle(
+                    this._frontMetalCheck.position,
+                    PlatformerCharacter2D.MetalRadius,
+                    this._whatIsWin)
+                || Physics2D.OverlapCircle(
+                    this._rearMetalCheck.position,
+                    PlatformerCharacter2D.MetalRadius,
+                    this._whatIsWin)
+                || Physics2D.OverlapCircle(
+                    this._ceilingCheck.position,
+                    PlatformerCharacter2D.MetalRadius,
+                    this._whatIsWin);
+
             this._anim.SetBool("Ground", this._grounded);
 
             // Set the vertical animation
@@ -218,6 +243,20 @@ namespace UnitySampleAssets._2D
 
         private void Update()
         {
+            if (Input.GetKey("escape"))
+            {
+                Application.Quit();
+            }
+            if (this._isWin)
+            {
+                this._anim.SetFloat("Speed", 0);
+                this._rigidBody2D.velocity = Vector2.zero;
+                this._winText.text = "You Win! Press Enter To Play Again.";
+                if (Input.GetButton("Submit"))
+                {
+                    SceneManager.LoadScene("Obstacles");
+                }
+            }
             if (Physics2D.OverlapCircle(
                 this._groundCheck.position,
                 PlatformerCharacter2D.GroundedRadius,
@@ -263,6 +302,7 @@ namespace UnitySampleAssets._2D
             bool pushHold,
             bool pull)
         {
+            if (this._isWin) { return; }
             var debug = new StringWriter();
             var forces = new List<Vector2>();
 
